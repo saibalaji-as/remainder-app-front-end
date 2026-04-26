@@ -1,0 +1,44 @@
+.add-form-card {
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.notes-field {
+  grid-column: 1 / -1;
+}
+
+.reminder-rules {
+  grid-column: 1 / -1;
+}
+
+.reminder-label {
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.reminder-option {
+  margin-bottom: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.reminder-chip {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1565c0;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  margin-right: 4px;
+}

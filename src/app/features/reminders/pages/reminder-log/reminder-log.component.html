@@ -1,0 +1,56 @@
+<div class="page-container">
+  <h1>Reminders</h1>
+
+  <div class="filter-row">
+    <button
+      *ngFor="let opt of statusOptions"
+      mat-button
+      [class.active-filter]="selectedStatus === opt.value"
+      (click)="onStatusFilter(opt.value)">
+      {{ opt.label }}
+    </button>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <mat-table [dataSource]="filteredReminders" *ngIf="!loading">
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef>#</mat-header-cell>
+      <mat-cell *matCellDef="let r">{{ r.id }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="appointmentId">
+      <mat-header-cell *matHeaderCellDef>Appointment</mat-header-cell>
+      <mat-cell *matCellDef="let r">#{{ r.appointmentId }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="channel">
+      <mat-header-cell *matHeaderCellDef>Channel</mat-header-cell>
+      <mat-cell *matCellDef="let r">{{ r.channel | uppercase }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="scheduledFor">
+      <mat-header-cell *matHeaderCellDef>Scheduled For</mat-header-cell>
+      <mat-cell *matCellDef="let r">{{ r.scheduledFor | date:'medium' }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="sentAt">
+      <mat-header-cell *matHeaderCellDef>Sent At</mat-header-cell>
+      <mat-cell *matCellDef="let r">{{ r.sentAt ? (r.sentAt | date:'medium') : '—' }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+      <mat-cell *matCellDef="let r">
+        <span [class]="statusClass(r.status)">{{ r.status }}</span>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <p *ngIf="!loading && filteredReminders.length === 0" class="empty-state">
+    No reminders found.
+  </p>
+</div>

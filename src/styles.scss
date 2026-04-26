@@ -1,0 +1,53 @@
+// Global styles
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// Layout helpers
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+// Card grid
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+// Status chips
+.status-sent    { color: #555; }
+.status-delivered { color: #2e7d32; font-weight: 500; }
+.status-failed  { color: #c62828; font-weight: 500; }
+
+// Full-width form fields
+.full-width {
+  width: 100%;
+}
+
+// Table helpers
+.mat-mdc-table {
+  width: 100%;
+}

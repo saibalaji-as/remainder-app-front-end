@@ -1,0 +1,57 @@
+<div class="page-container">
+  <h1>Dashboard</h1>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div class="stats-grid" *ngIf="!loading && stats">
+    <mat-card>
+      <mat-card-content>
+        <div class="stat-row">
+          <mat-icon color="primary">event</mat-icon>
+          <div>
+            <div class="stat-value">{{ stats.totalAppointments }}</div>
+            <div class="stat-label">Total Appointments</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="stat-row">
+          <mat-icon color="accent">check_circle</mat-icon>
+          <div>
+            <div class="stat-value">{{ stats.completionRate }}%</div>
+            <div class="stat-label">Completion Rate</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="stat-row">
+          <mat-icon color="primary">today</mat-icon>
+          <div>
+            <div class="stat-value">{{ stats.scheduledToday }}</div>
+            <div class="stat-label">Scheduled Today</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-content>
+        <div class="stat-row">
+          <mat-icon color="accent">done_all</mat-icon>
+          <div>
+            <div class="stat-value">{{ stats.completedAppointments }}</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p *ngIf="!loading && !stats" class="empty-state">No appointment data available.</p>
+</div>

@@ -1,0 +1,113 @@
+<div class="page-container">
+  <div class="flex-row">
+    <h1>Contacts</h1>
+    <span class="spacer"></span>
+    <button mat-flat-button color="primary" (click)="showAddForm = !showAddForm">
+      <mat-icon>add</mat-icon> Add Contact
+    </button>
+    <label>
+      <button mat-stroked-button type="button" onclick="this.nextElementSibling.click()">
+        <mat-icon>upload_file</mat-icon> Import CSV
+      </button>
+      <input type="file" accept=".csv" hidden (change)="onCsvFileSelected($event)">
+    </label>
+  </div>
+
+  <!-- Add Contact Form -->
+  <mat-card *ngIf="showAddForm" class="add-form-card">
+    <mat-card-header><mat-card-title>New Contact</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="form-grid">
+        <mat-form-field>
+          <mat-label>Full Name</mat-label>
+          <input matInput formControlName="name">
+          <mat-error *ngIf="addForm.get('name')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email">
+          <mat-error *ngIf="addForm.get('email')?.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="addForm.get('email')?.hasError('email')">Invalid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone">
+          <mat-error *ngIf="addForm.get('phone')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit">Save</button>
+          <button mat-button type="button" (click)="showAddForm = false">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- CSV Preview -->
+  <mat-card *ngIf="csvPreviewRows.length > 0" class="csv-preview-card">
+    <mat-card-header><mat-card-title>CSV Preview (first 5 rows)</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <table class="csv-table">
+        <thead>
+          <tr><th *ngFor="let h of csvHeaders">{{ h }}</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of csvPreviewRows">
+            <td *ngFor="let cell of row">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button color="primary" (click)="confirmCsvImport()">Confirm Import</button>
+      <button mat-button (click)="csvPreviewRows = []">Cancel</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Search -->
+  <mat-form-field class="search-field">
+    <mat-label>Search contacts</mat-label>
+    <input matInput [formControl]="searchControl">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <mat-table [dataSource]="pagedContacts" *ngIf="!loading">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let c">{{ c.name }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+      <mat-cell *matCellDef="let c">{{ c.email }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+      <mat-header-cell *matHeaderCellDef>Phone</mat-header-cell>
+      <mat-cell *matCellDef="let c">{{ c.phone }}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let c">
+        <button mat-icon-button color="warn" (click)="deleteContact(c)" aria-label="Delete contact">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <mat-paginator
+    [length]="filteredContacts.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="onPage($event)">
+  </mat-paginator>
+</div>
