@@ -68,7 +68,7 @@ describe('AuthService', () => {
           done();
         });
 
-        const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
+        const req = httpMock.expectOne(`${environment.apiBaseUrl}/auth/login`);
         req.flush(mockResponse);
       });
     });

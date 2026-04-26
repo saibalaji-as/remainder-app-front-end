@@ -31,7 +31,14 @@ export interface RegisterPayload {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(
-    JSON.parse(localStorage.getItem('user') ?? 'null')
+    (() => {
+      try {
+        const raw = localStorage.getItem('user');
+        return raw && raw !== 'undefined' ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    })()
   );
 
   currentUser$ = this.currentUserSubject.asObservable();
@@ -39,13 +46,13 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(payload: LoginPayload): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload).pipe(
+    return this.http.post<AuthResponse>(`${environment.apiBaseUrl}/auth/login`, payload).pipe(
       tap(res => this.storeSession(res))
     );
   }
 
   register(payload: RegisterPayload): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, payload).pipe(
+    return this.http.post<AuthResponse>(`${environment.apiBaseUrl}/auth/register`, payload).pipe(
       tap(res => this.storeSession(res))
     );
   }
