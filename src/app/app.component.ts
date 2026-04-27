@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -37,13 +37,23 @@ export class AppComponent implements OnInit {
     { label: 'Billing',       icon: 'credit_card',      route: '/billing' }
   ];
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
+    // Set initial value based on current URL (handles page refresh / direct navigation)
+    this.isAuthPage = this.router.url.startsWith('/auth');
+
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: NavigationEnd) => {
-      this.isAuthPage = e.urlAfterRedirects.startsWith('/auth');
+      // Run inside Angular zone to guarantee change detection fires
+      this.ngZone.run(() => {
+        this.isAuthPage = e.urlAfterRedirects.startsWith('/auth');
+      });
     });
   }
 
