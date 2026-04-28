@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://api.yourproductiondomain.com/api'
+  apiBaseUrl: 'https://remainder-app-backend.onrender.com/api'
 };
