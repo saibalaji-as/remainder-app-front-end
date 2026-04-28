@@ -9,9 +9,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Appointment, AppointmentCreateDto, ReminderChannel } from '../../../../core/models/appointment.model';
 import { Contact } from '../../../../core/models/contact.model';
 
@@ -29,6 +31,7 @@ import { Contact } from '../../../../core/models/contact.model';
     MatCardModule,
     MatSelectModule,
     MatChipsModule,
+    MatDialogModule,
     LoadingSpinnerComponent
   ],
   templateUrl: './appointment-list.component.html',
@@ -57,7 +60,8 @@ export class AppointmentListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
-    private toast: ToastService
+    private toast: ToastService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -118,5 +122,19 @@ export class AppointmentListComponent implements OnInit {
 
   getContactName(appointment: Appointment): string {
     return appointment.Contact?.name ?? `Contact #${appointment.contactId}`;
+  }
+
+  deleteAppointment(appointment: Appointment): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: { title: 'Delete Appointment', message: `Delete "${appointment.title}"?`, confirmLabel: 'Delete' }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.api.delete(`/appointments/${appointment.id}`).subscribe({
+          next: () => { this.toast.success('Appointment deleted.'); this.loadAppointments(); },
+          error: () => this.toast.error('Failed to delete appointment.')
+        });
+      }
+    });
   }
 }

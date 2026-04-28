@@ -1,0 +1,638 @@
+// ─── Variables ───────────────────────────────────────────────────────────────
+$primary: #1976d2;
+$primary-light: #e3f2fd;
+$dark-bg: #1a1a2e;
+$gray-bg: #f5f7fa;
+$section-pad-desktop: 80px;
+$section-pad-mobile: 48px;
+
+// ─── Shared ──────────────────────────────────────────────────────────────────
+.section-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 48px;
+  color: #1a1a2e;
+
+  &--light {
+    color: #fff;
+  }
+}
+
+// ─── Navbar ──────────────────────────────────────────────────────────────────
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  transition: box-shadow 0.25s ease;
+
+  &--scrolled {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  &__inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: $primary;
+    text-decoration: none;
+  }
+
+  &__brand-icon {
+    font-size: 1.6rem;
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.hero {
+  padding: calc(#{$section-pad-desktop} + 64px) 0 $section-pad-desktop;
+  background: linear-gradient(135deg, $primary-light 0%, #fff 60%);
+
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__headline {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #1a1a2e;
+    margin: 0 0 20px;
+  }
+
+  &__sub {
+    font-size: 1.15rem;
+    color: #555;
+    line-height: 1.7;
+    margin: 0 0 32px;
+    max-width: 520px;
+  }
+
+  &__ctas {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__visual {
+    flex: 0 0 340px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__phone-mock {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 32px 24px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(25, 118, 210, 0.15);
+    width: 280px;
+  }
+
+  &__phone-icon {
+    font-size: 3.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    color: $primary;
+  }
+
+  &__bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    width: 100%;
+
+    mat-icon {
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    &--sms {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &--email {
+      background: $primary-light;
+      color: $primary;
+    }
+  }
+}
+
+// ─── Problem ─────────────────────────────────────────────────────────────────
+.problem {
+  background: $dark-bg;
+  padding: $section-pad-desktop 0;
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+    border-radius: 12px;
+
+    &__value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #64b5f6;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    &__label {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+  }
+
+  &__subtext {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 0 auto;
+
+    strong {
+      color: #fff;
+    }
+  }
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+.how-it-works {
+  background: $gray-bg;
+  padding: $section-pad-desktop 0;
+
+  .steps-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .step {
+    text-align: center;
+    padding: 32px 24px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+
+    &__number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: $primary;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    &__icon {
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    &__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: #1a1a2e;
+    }
+
+    &__desc {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}
+
+// ─── Features ─────────────────────────────────────────────────────────────────
+.features {
+  background: #fff;
+  padding: $section-pad-desktop 0;
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-card {
+    border-radius: 12px;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 6px 24px rgba(25, 118, 210, 0.15);
+    }
+
+    &__icon {
+      font-size: 2.2rem;
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-bottom: 12px;
+    }
+
+    &__title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: #1a1a2e;
+    }
+
+    &__desc {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}
+
+// ─── Pricing ─────────────────────────────────────────────────────────────────
+.pricing {
+  background: $gray-bg;
+  padding: $section-pad-desktop 0;
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .pricing-card {
+    border-radius: 16px;
+    transition: transform 0.2s ease;
+
+    &--popular {
+      transform: scale(1.04);
+      border: 2px solid $primary;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    &__name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    &__price {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: $primary;
+      margin: 12px 0 16px;
+    }
+
+    &__period {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #888;
+    }
+
+    &__perks {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 24px;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #444;
+        padding: 6px 0;
+      }
+    }
+
+    &__cta {
+      width: 100%;
+      display: block;
+      text-align: center;
+    }
+  }
+
+  .popular-chip {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .perk-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    color: #43a047;
+  }
+}
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+.testimonials {
+  background: #fff;
+  padding: $section-pad-desktop 0;
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .testimonial-card {
+    border-radius: 12px;
+    border-left: 4px solid $primary;
+
+    &__quote {
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      color: $primary;
+      opacity: 0.4;
+      margin-bottom: 8px;
+    }
+
+    &__text {
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.7;
+      font-style: italic;
+      margin: 0 0 20px;
+    }
+
+    &__author {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      strong {
+        font-size: 0.95rem;
+        color: #1a1a2e;
+      }
+
+      span {
+        font-size: 0.85rem;
+        color: #888;
+      }
+    }
+  }
+}
+
+// ─── FAQ ─────────────────────────────────────────────────────────────────────
+.faq {
+  background: $gray-bg;
+  padding: $section-pad-desktop 0;
+
+  &__accordion {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  &__panel {
+    margin-bottom: 8px;
+    border-radius: 8px !important;
+    overflow: hidden;
+  }
+}
+
+// ─── Final CTA ────────────────────────────────────────────────────────────────
+.final-cta {
+  background: $primary;
+  padding: $section-pad-desktop 0;
+
+  &__inner {
+    text-align: center;
+  }
+
+  &__headline {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 16px;
+  }
+
+  &__sub {
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 32px;
+  }
+
+  &__btn {
+    background: #fff !important;
+    color: $primary !important;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0 32px;
+    height: 48px;
+  }
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.footer {
+  background: $dark-bg;
+  padding: 48px 0 24px;
+  color: rgba(255, 255, 255, 0.8);
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+
+    mat-icon {
+      color: #64b5f6;
+    }
+  }
+
+  &__tagline {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+  }
+
+  &__links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+
+    a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+
+  &__copy {
+    mat-divider {
+      border-color: rgba(255, 255, 255, 0.1);
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin: 0;
+    }
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@media (max-width: 960px) {
+  .hero {
+    &__content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    &__visual {
+      flex: none;
+      width: 100%;
+    }
+
+    &__phone-mock {
+      width: 260px;
+      margin: 0 auto;
+    }
+
+    &__ctas {
+      justify-content: center;
+    }
+
+    &__sub {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .problem .stats-row,
+  .how-it-works .steps-row,
+  .features .features-grid,
+  .pricing .pricing-grid,
+  .testimonials .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing .pricing-card--popular {
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: calc(#{$section-pad-mobile} + 64px) 0 $section-pad-mobile;
+
+    &__headline {
+      font-size: 2rem;
+    }
+  }
+
+  .problem,
+  .how-it-works,
+  .features,
+  .pricing,
+  .testimonials,
+  .faq,
+  .final-cta {
+    padding: $section-pad-mobile 0;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 32px;
+  }
+
+  .navbar__actions {
+    gap: 8px;
+
+    a, button {
+      font-size: 0.8rem;
+      padding: 0 12px;
+    }
+  }
+
+  .final-cta__headline {
+    font-size: 1.8rem;
+  }
+}

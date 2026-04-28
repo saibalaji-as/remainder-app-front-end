@@ -52,9 +52,16 @@ export class BillingComponent implements OnInit {
 
   loadSubscription(): void {
     this.loading = true;
-    // GET /billing/subscribe is not a backend endpoint — subscription info
-    // comes back after POST. We show the subscribe form if no active subscription.
-    this.loading = false;
+    this.api.get<{ subscription: Subscription | null }>('/billing/subscribe').subscribe({
+      next: (res) => {
+        this.subscription = res.subscription;
+        this.loading = false;
+      },
+      error: () => {
+        this.toast.error('Failed to load subscription.');
+        this.loading = false;
+      }
+    });
   }
 
   subscribe(): void {

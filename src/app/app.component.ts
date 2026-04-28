@@ -45,19 +45,23 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Set initial value based on current URL (handles page refresh / direct navigation)
-    this.isAuthPage = this.router.url.startsWith('/auth');
+    this.isAuthPage = this.isPublicRoute(this.router.url);
 
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: NavigationEnd) => {
       // Run inside Angular zone to guarantee change detection fires
       this.ngZone.run(() => {
-        this.isAuthPage = e.urlAfterRedirects.startsWith('/auth');
+        this.isAuthPage = this.isPublicRoute(e.urlAfterRedirects);
       });
     });
   }
 
   logout(): void {
     this.authService.logout();
+  }
+
+  private isPublicRoute(url: string): boolean {
+    return url.startsWith('/auth') || url === '/' || url === '';
   }
 }
