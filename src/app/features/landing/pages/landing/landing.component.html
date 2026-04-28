@@ -1,200 +1,365 @@
-<!-- ===== NAVBAR ===== -->
-<header class="navbar" [class.navbar--scrolled]="navScrolled">
-  <div class="navbar__inner">
-    <span class="navbar__brand">
-      <mat-icon class="navbar__brand-icon">notifications_active</mat-icon>
-      Schedify
-    </span>
-    <div class="navbar__actions">
-      <a mat-stroked-button color="primary" routerLink="/auth/login">Login</a>
-      <a mat-raised-button color="primary" routerLink="/auth/register">Get Started Free</a>
-    </div>
-  </div>
-</header>
+<div class="landing">
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="section-inner hero__content">
-    <div class="hero__text">
-      <h1 class="hero__headline">Stop Losing Patients<br>to No-Shows</h1>
-      <p class="hero__sub">
-        Automatically send SMS and email reminders to your customers before every appointment.
-        Set it up in minutes. Works for any business.
-      </p>
-      <div class="hero__ctas">
-        <a mat-raised-button color="primary" routerLink="/auth/register" class="cta-primary">
-          Start Free Trial
+  <!-- ===== NAVBAR ===== -->
+  <header class="nav" [class.nav--scrolled]="navScrolled">
+    <div class="nav__container">
+      <nav class="nav__bar" [class.nav__bar--scrolled]="navScrolled">
+        <!-- Brand -->
+        <a class="nav__brand" routerLink="/">
+          <span class="nav__logo-wrap">
+            <span class="material-icons" style="font-size:18px;color:#fff;">notifications_active</span>
+          </span>
+          <span class="nav__brand-name">Schedify</span>
         </a>
-        <button mat-stroked-button color="primary" (click)="scrollTo('how-it-works')" class="cta-secondary">
-          See How It Works
+
+        <!-- Desktop links -->
+        <div class="nav__links">
+          <a class="nav__link" (click)="scrollTo('features')">Features</a>
+          <a class="nav__link" (click)="scrollTo('how')">How it works</a>
+          <a class="nav__link" (click)="scrollTo('pricing')">Pricing</a>
+          <a class="nav__link" (click)="scrollTo('faq')">FAQ</a>
+        </div>
+
+        <!-- Desktop actions -->
+        <div class="nav__actions">
+          <a class="nav__login" routerLink="/auth/login">Login</a>
+          <a class="nav__cta" routerLink="/auth/register">Get Started Free</a>
+        </div>
+
+        <!-- Hamburger -->
+        <button class="nav__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
+          <span class="material-icons">{{ menuOpen ? 'close' : 'menu' }}</span>
         </button>
+      </nav>
+
+      <!-- Mobile drawer -->
+      <div class="nav__mobile" *ngIf="menuOpen">
+        <a class="nav__mobile-link" (click)="scrollTo('features')">Features</a>
+        <a class="nav__mobile-link" (click)="scrollTo('how')">How it works</a>
+        <a class="nav__mobile-link" (click)="scrollTo('pricing')">Pricing</a>
+        <a class="nav__mobile-link" (click)="scrollTo('faq')">FAQ</a>
+        <a class="nav__mobile-cta" routerLink="/auth/register" (click)="toggleMenu()">Get Started Free</a>
       </div>
     </div>
-    <div class="hero__visual">
-      <div class="hero__phone-mock">
-        <mat-icon class="hero__phone-icon">smartphone</mat-icon>
-        <div class="hero__bubble hero__bubble--sms">
-          <mat-icon>sms</mat-icon>
-          <span>Reminder: Your appointment is in 2 hours!</span>
-        </div>
-        <div class="hero__bubble hero__bubble--email">
-          <mat-icon>email</mat-icon>
-          <span>Appointment confirmed for tomorrow at 10 AM</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  </header>
 
-<!-- ===== PROBLEM ===== -->
-<section class="problem">
-  <div class="section-inner">
-    <h2 class="section-title section-title--light">No-shows are killing your revenue</h2>
-    <div class="stats-row">
-      <mat-card *ngFor="let stat of stats" class="stat-card">
-        <mat-card-content>
-          <div class="stat-card__value">{{ stat.value }}</div>
-          <div class="stat-card__label">{{ stat.label }}</div>
-        </mat-card-content>
-      </mat-card>
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="top">
+    <!-- Orbs -->
+    <div class="hero__orbs" aria-hidden="true">
+      <div class="orb orb--violet"></div>
+      <div class="orb orb--fuchsia"></div>
+      <div class="orb orb--cyan"></div>
     </div>
-    <p class="problem__subtext">
-      Manual calling is time-consuming. Relying on customers to remember doesn't work.
-      <strong>There's a better way.</strong>
-    </p>
-  </div>
-</section>
+    <div class="hero__grid-overlay" aria-hidden="true"></div>
 
-<!-- ===== HOW IT WORKS ===== -->
-<section class="how-it-works" id="how-it-works">
-  <div class="section-inner">
-    <h2 class="section-title">Set up in 3 simple steps</h2>
-    <div class="steps-row">
-      <div *ngFor="let step of steps; let i = index" class="step">
-        <div class="step__number">{{ i + 1 }}</div>
-        <mat-icon class="step__icon" color="primary">{{ step.icon }}</mat-icon>
-        <h3 class="step__title">{{ step.title }}</h3>
-        <p class="step__desc">{{ step.desc }}</p>
-      </div>
-    </div>
-  </div>
-</section>
+    <div class="section-inner">
+      <div class="hero__inner">
+        <!-- Copy -->
+        <div class="hero__copy">
+          <span class="hero__pill">
+            <span class="material-icons" style="font-size:16px;">auto_awesome</span>
+            Appointment reminders, on autopilot
+          </span>
 
-<!-- ===== FEATURES ===== -->
-<section class="features">
-  <div class="section-inner">
-    <h2 class="section-title">Everything you need to reduce no-shows</h2>
-    <div class="features-grid">
-      <mat-card *ngFor="let feat of features" class="feature-card">
-        <mat-card-content>
-          <mat-icon class="feature-card__icon" color="primary">{{ feat.icon }}</mat-icon>
-          <h3 class="feature-card__title">{{ feat.title }}</h3>
-          <p class="feature-card__desc">{{ feat.desc }}</p>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
-</section>
+          <h1 class="hero__h1">
+            Stop losing revenue to <span class="grad-text">no-shows.</span>
+          </h1>
 
-<!-- ===== PRICING ===== -->
-<section class="pricing" id="pricing">
-  <div class="section-inner">
-    <h2 class="section-title">Simple, transparent pricing</h2>
-    <div class="pricing-grid">
-      <mat-card
-        *ngFor="let plan of plans"
-        class="pricing-card"
-        [class.pricing-card--popular]="plan.popular"
-        [class.mat-elevation-z8]="plan.popular"
-      >
-        <mat-card-content>
-          <div class="pricing-card__header">
-            <span class="pricing-card__name">{{ plan.name }}</span>
-            <mat-chip *ngIf="plan.popular" class="popular-chip" color="accent" highlighted>Most Popular</mat-chip>
+          <p class="hero__sub">
+            Schedify sends automatic SMS and email reminders before every appointment.
+            Set it up in minutes — works for clinics, salons, studios, and any booking business.
+          </p>
+
+          <div class="hero__ctas">
+            <a class="btn-gradient" routerLink="/auth/register">
+              Start free trial
+              <span class="material-icons btn-arrow">arrow_forward</span>
+            </a>
+            <button class="btn-glass" (click)="scrollTo('how')">See how it works</button>
           </div>
-          <div class="pricing-card__price">
-            {{ plan.price }}<span class="pricing-card__period">{{ plan.period }}</span>
+
+          <div class="hero__stars">
+            <span class="hero__stars-icons">
+              <span class="material-icons hero__star" *ngFor="let s of [1,2,3,4,5]">star</span>
+            </span>
+            <span class="hero__stars-text">Loved by 2,000+ appointment-based businesses</span>
           </div>
-          <mat-divider></mat-divider>
-          <ul class="pricing-card__perks">
-            <li *ngFor="let perk of plan.perks">
-              <mat-icon class="perk-icon">check_circle</mat-icon>
+        </div>
+
+        <!-- Phone mockup -->
+        <div class="hero__mockup">
+          <div class="phone-glow" aria-hidden="true"></div>
+          <div class="phone">
+            <div class="phone__screen">
+              <div class="phone__notch"></div>
+              <div class="phone__header">
+                <span class="phone__time">9:41</span>
+                <span class="phone__brand">
+                  <span class="phone__brand-dot"></span>
+                  Schedify
+                </span>
+              </div>
+              <div class="phone__messages">
+                <div *ngFor="let m of visibleMessages" class="msg msg--{{m.kind}}">
+                  <div class="msg__header">
+                    <span class="msg__badge">
+                      <span class="material-icons" style="font-size:12px;">{{ m.kind === 'sms' ? 'sms' : m.kind === 'email' ? 'email' : 'check_circle' }}</span>
+                      {{ m.title }}
+                    </span>
+                    <span class="msg__time">{{ m.time }}</span>
+                  </div>
+                  <p class="msg__body">{{ m.body }}</p>
+                </div>
+              </div>
+              <div class="phone__fade"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LOGO CLOUD ===== -->
+  <section class="logocloud">
+    <div class="section-inner">
+      <p class="logocloud__label">TRUSTED BY TEAMS AT</p>
+      <div class="logocloud__grid">
+        <span *ngFor="let l of trustedBy" class="logocloud__item">{{ l }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="stats">
+    <div class="section-inner">
+      <h2 class="section-title" style="text-align:center;margin-bottom:40px;">
+        No-shows are quietly <span class="grad-text">killing your revenue</span>
+      </h2>
+      <div class="stats__grid">
+        <div *ngFor="let s of stats; let i = index"
+             class="stat-card reveal"
+             [attr.data-delay]="i * 100">
+          <div class="stat-card__glow"></div>
+          <div class="stat-card__value grad-text">{{ s.value }}</div>
+          <p class="stat-card__label">{{ s.label }}</p>
+        </div>
+      </div>
+      <p class="stats__sub">
+        Manual calls eat your team's time. Relying on customers to remember doesn't work.
+        <strong style="color:var(--foreground);">There's a better way.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" id="features">
+    <div class="section-inner">
+      <div class="section-header section-header--left reveal">
+        <span class="eyebrow">Features</span>
+        <h2 class="section-title">
+          Everything you need to <span class="grad-text">reduce no-shows</span>
+        </h2>
+        <p class="section-sub">
+          A focused toolkit that quietly runs in the background so your team doesn't have to chase reminders.
+        </p>
+      </div>
+      <div class="features__grid">
+        <div *ngFor="let f of features; let i = index"
+             class="feat-card feat-card--{{f.tint}} reveal"
+             [attr.data-delay]="i * 80">
+          <div class="feat-card__icon-wrap">
+            <span class="material-icons">{{ f.icon }}</span>
+          </div>
+          <h3 class="feat-card__title">{{ f.title }}</h3>
+          <p class="feat-card__desc">{{ f.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how" id="how">
+    <div class="section-inner">
+      <div class="section-header section-header--center reveal">
+        <span class="eyebrow">How it works</span>
+        <h2 class="section-title">
+          Set up in <span class="grad-text">three simple steps</span>
+        </h2>
+      </div>
+      <div class="how__grid">
+        <div class="how__connector" aria-hidden="true"></div>
+        <div *ngFor="let s of steps; let i = index"
+             class="step-card reveal"
+             [attr.data-delay]="i * 100">
+          <div class="step-card__icon-wrap">
+            <span class="material-icons">{{ s.icon }}</span>
+          </div>
+          <div class="step-card__num">0{{ i + 1 }}</div>
+          <h3 class="step-card__title">{{ s.title }}</h3>
+          <p class="step-card__desc">{{ s.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="pricing" id="pricing">
+    <div class="section-inner">
+      <div class="section-header section-header--center reveal">
+        <span class="eyebrow">Pricing</span>
+        <h2 class="section-title">
+          Simple pricing. <span class="grad-text">Pays for itself.</span>
+        </h2>
+        <p class="section-sub">
+          Recover more revenue than Schedify costs within your first week. Or cancel — no questions asked.
+        </p>
+      </div>
+      <div class="pricing__grid">
+        <div *ngFor="let p of plans; let i = index"
+             class="plan-card reveal"
+             [class.plan-card--popular]="p.popular"
+             [attr.data-delay]="i * 100">
+          <div *ngIf="p.popular" class="plan-card__badge">Most popular</div>
+          <div *ngIf="p.popular" class="plan-card__border"></div>
+          <h3 class="plan-card__name">{{ p.name }}</h3>
+          <p class="plan-card__tagline">{{ p.tagline }}</p>
+          <div class="plan-card__price">
+            {{ p.price }}<span class="plan-card__period">{{ p.period }}</span>
+          </div>
+          <ul class="plan-card__perks">
+            <li *ngFor="let perk of p.perks" class="plan-card__perk">
+              <span class="perk-check"><span class="material-icons" style="font-size:12px;color:#fff;">check</span></span>
               {{ perk }}
             </li>
           </ul>
-          <a mat-raised-button color="primary" routerLink="/auth/register" class="pricing-card__cta">
+          <a routerLink="/auth/register"
+             class="plan-card__cta"
+             [class.plan-card__cta--gradient]="p.popular"
+             [class.plan-card__cta--glass]="!p.popular">
             Get Started
           </a>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== TESTIMONIALS ===== -->
-<section class="testimonials">
-  <div class="section-inner">
-    <h2 class="section-title">Trusted by businesses like yours</h2>
-    <div class="testimonials-grid">
-      <mat-card *ngFor="let t of testimonials" class="testimonial-card">
-        <mat-card-content>
-          <mat-icon class="testimonial-card__quote">format_quote</mat-icon>
-          <p class="testimonial-card__text">{{ t.quote }}</p>
-          <div class="testimonial-card__author">
-            <strong>{{ t.name }}</strong>
-            <span>{{ t.business }}</span>
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="testimonials">
+    <div class="section-inner">
+      <div class="section-header section-header--center reveal">
+        <span class="eyebrow">Loved by operators</span>
+        <h2 class="section-title">
+          Results, <span class="grad-text">not promises.</span>
+        </h2>
+      </div>
+      <div class="testimonials__grid">
+        <figure *ngFor="let t of testimonials; let i = index"
+                class="testi-card reveal"
+                [attr.data-delay]="i * 100">
+          <div class="testi-card__stars">
+            <span class="material-icons testi-card__star" *ngFor="let s of [1,2,3,4,5]">star</span>
           </div>
-        </mat-card-content>
-      </mat-card>
+          <blockquote class="testi-card__quote">"{{ t.quote }}"</blockquote>
+          <figcaption class="testi-card__author">
+            <span class="testi-card__avatar testi-card__avatar--{{t.tint}}">{{ t.name.charAt(0) }}</span>
+            <span class="testi-card__meta">
+              <strong class="testi-card__name">{{ t.name }}</strong>
+              <span class="testi-card__business">{{ t.business }}</span>
+            </span>
+          </figcaption>
+        </figure>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== FAQ ===== -->
-<section class="faq">
-  <div class="section-inner">
-    <h2 class="section-title">Frequently asked questions</h2>
-    <mat-accordion class="faq__accordion">
-      <mat-expansion-panel *ngFor="let faq of faqs" class="faq__panel">
-        <mat-expansion-panel-header>
-          <mat-panel-title>{{ faq.q }}</mat-panel-title>
-        </mat-expansion-panel-header>
-        <p>{{ faq.a }}</p>
-      </mat-expansion-panel>
-    </mat-accordion>
-  </div>
-</section>
+  <!-- ===== FAQ ===== -->
+  <section class="faq" id="faq">
+    <div class="section-inner section-inner--narrow">
+      <div class="section-header section-header--center reveal">
+        <span class="eyebrow">FAQ</span>
+        <h2 class="section-title">
+          Questions, <span class="grad-text">answered.</span>
+        </h2>
+      </div>
+      <div class="faq__accordion">
+        <div *ngFor="let f of faqs; let i = index"
+             class="faq-item"
+             [class.faq-item--open]="openFaq === i">
+          <button class="faq-item__q" (click)="toggleFaq(i)">
+            {{ f.q }}
+            <span class="material-icons faq-chevron">expand_more</span>
+          </button>
+          <div class="faq-item__a">
+            <p>{{ f.a }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- ===== FINAL CTA ===== -->
-<section class="final-cta">
-  <div class="section-inner final-cta__inner">
-    <h2 class="final-cta__headline">Ready to eliminate no-shows?</h2>
-    <p class="final-cta__sub">Join hundreds of businesses already saving time and revenue with Schedify.</p>
-    <a mat-raised-button color="primary" routerLink="/auth/register" class="final-cta__btn">
-      Start Free Today
-    </a>
-  </div>
-</section>
+  <!-- ===== FINAL CTA ===== -->
+  <section class="cta-section" id="cta">
+    <div class="section-inner">
+      <div class="cta-box reveal">
+        <div class="cta-box__bg"></div>
+        <div class="cta-box__overlay"></div>
+        <div class="cta-box__grid"></div>
+        <div class="cta-box__content">
+          <h2 class="cta-box__h2">Ready to end no-shows?</h2>
+          <p class="cta-box__sub">
+            Join hundreds of businesses already saving time and revenue with Schedify.
+          </p>
+          <a class="cta-box__btn" routerLink="/auth/register">
+            Start Free Today
+            <span class="material-icons btn-arrow">arrow_forward</span>
+          </a>
+          <p class="cta-box__note">No credit card required · Setup in under 10 minutes</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-  <div class="section-inner footer__inner">
-    <div class="footer__brand">
-      <span class="footer__name">
-        <mat-icon>notifications_active</mat-icon>
-        Schedify
-      </span>
-      <p class="footer__tagline">Automated reminders. Fewer no-shows. More revenue.</p>
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="section-inner">
+      <div class="footer__grid">
+        <!-- Brand column -->
+        <div class="footer__brand-col">
+          <a class="footer__brand" routerLink="/">
+            <span class="footer__logo-wrap">
+              <span class="material-icons" style="font-size:16px;color:#fff;">notifications_active</span>
+            </span>
+            <span class="footer__brand-name">Schedify</span>
+          </a>
+          <p class="footer__tagline">Automated reminders. Fewer no-shows. More revenue.</p>
+          <div class="footer__socials">
+            <a class="footer__social" href="#" aria-label="Twitter">
+              <span class="material-icons" style="font-size:18px;">alternate_email</span>
+            </a>
+            <a class="footer__social" href="#" aria-label="GitHub">
+              <span class="material-icons" style="font-size:18px;">code</span>
+            </a>
+            <a class="footer__social" href="#" aria-label="LinkedIn">
+              <span class="material-icons" style="font-size:18px;">work</span>
+            </a>
+          </div>
+        </div>
+        <!-- Link columns -->
+        <div *ngFor="let col of footerCols" class="footer__col">
+          <h4 class="footer__col-title">{{ col.title }}</h4>
+          <ul class="footer__col-links">
+            <li *ngFor="let link of col.links">
+              <a class="footer__link" href="#">{{ link }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>© {{ currentYear }} Schedify. All rights reserved.</p>
+        <p class="footer__made">Made for appointment-based businesses. Crafted with care.</p>
+      </div>
     </div>
-    <div class="footer__links">
-      <a routerLink="/auth/login">Login</a>
-      <a routerLink="/auth/register">Sign Up</a>
-      <a (click)="scrollTo('pricing')" style="cursor:pointer">Pricing</a>
-      <a (click)="scrollTo('how-it-works')" style="cursor:pointer">How It Works</a>
-    </div>
-    <div class="footer__copy">
-      <mat-divider></mat-divider>
-      <p>© {{ 2025 }} Schedify. All rights reserved.</p>
-    </div>
-  </div>
-</footer>
+  </footer>
+
+</div>
