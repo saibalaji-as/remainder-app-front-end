@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PwaService } from './pwa.service';
 
 export interface User {
   id: string;
@@ -43,6 +44,8 @@ export class AuthService {
 
   currentUser$ = this.currentUserSubject.asObservable();
 
+  private readonly pwaService = inject(PwaService);
+
   constructor(private http: HttpClient, private router: Router) {}
 
   login(payload: LoginPayload): Observable<AuthResponse> {
@@ -57,7 +60,13 @@ export class AuthService {
     );
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
+    try {
+      await this.pwaService.clearApiCaches();
+    } catch {
+      // Cache clearing errors are already swallowed in PwaService,
+      // but guard here too so logout always completes
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);

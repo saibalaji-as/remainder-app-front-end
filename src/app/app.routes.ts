@@ -34,10 +34,14 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/reminders/reminders.module').then(m => m.RemindersModule)
   },
-  {
-    path: 'billing',
+  { path: 'billing',
     canActivate: [authGuard],
     loadChildren: () => import('./features/billing/billing.module').then(m => m.BillingModule)
+  },
+  {
+    path: 'offline',
+    loadComponent: () =>
+      import('./features/offline/offline.component').then(m => m.OfflineComponent)
   },
   { path: '**', redirectTo: 'dashboard' }
 ];

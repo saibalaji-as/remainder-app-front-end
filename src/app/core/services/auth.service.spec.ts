@@ -2,9 +2,23 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
+import { SwUpdate, SwPush } from '@angular/service-worker';
+import { EMPTY, of } from 'rxjs';
 
 import { AuthService, AuthResponse, User } from './auth.service';
 import { environment } from '../../../environments/environment';
+
+/** Minimal SwUpdate stub — isEnabled=false so no subscription side-effects */
+const swUpdateStub: Partial<SwUpdate> = {
+  isEnabled: false,
+  versionUpdates: EMPTY as any,
+};
+
+/** Minimal SwPush stub */
+const swPushStub: Partial<SwPush> = {
+  isEnabled: false,
+  subscription: of(null) as any,
+};
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -16,7 +30,11 @@ describe('AuthService', () => {
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RouterTestingModule],
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        { provide: SwUpdate, useValue: swUpdateStub },
+        { provide: SwPush, useValue: swPushStub },
+      ],
     });
 
     service = TestBed.inject(AuthService);
@@ -108,7 +126,7 @@ describe('AuthService', () => {
   // 7.3 — logout clears session state and navigates
   // ---------------------------------------------------------------------------
   describe('logout()', () => {
-    it('removes token and user from localStorage, emits null, and navigates to /auth/login', (done) => {
+    it('removes token and user from localStorage, emits null, and navigates to /auth/login', async () => {
       // Arrange: store a session first
       localStorage.setItem('token', 'stored-token');
       localStorage.setItem('user', JSON.stringify({ id: '1', name: 'Test', email: 't@t.com', role: 'admin' }));
@@ -118,7 +136,7 @@ describe('AuthService', () => {
       service.currentUser$.subscribe((u) => emitted.push(u));
 
       // Act
-      service.logout();
+      await service.logout();
 
       // Assert localStorage cleared
       expect(localStorage.getItem('token')).toBeNull();
@@ -129,8 +147,6 @@ describe('AuthService', () => {
 
       // Assert navigation
       expect(navigateSpy).toHaveBeenCalledWith(['/auth/login']);
-
-      done();
     });
   });
 
@@ -146,7 +162,11 @@ describe('AuthService', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule, RouterTestingModule],
-        providers: [AuthService],
+        providers: [
+          AuthService,
+          { provide: SwUpdate, useValue: swUpdateStub },
+          { provide: SwPush, useValue: swPushStub },
+        ],
       });
       const freshService = TestBed.inject(AuthService);
 
@@ -162,7 +182,11 @@ describe('AuthService', () => {
       TestBed.resetTestingModule();
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule, RouterTestingModule],
-        providers: [AuthService],
+        providers: [
+          AuthService,
+          { provide: SwUpdate, useValue: swUpdateStub },
+          { provide: SwPush, useValue: swPushStub },
+        ],
       });
       const freshService = TestBed.inject(AuthService);
 

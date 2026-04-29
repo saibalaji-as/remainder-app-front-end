@@ -5,6 +5,9 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { BrandMarkComponent } from '../brand-mark/brand-mark.component';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
+import { UpdateNotificationComponent } from '../update-notification/update-notification.component';
+import { InstallPromptComponent } from '../install-prompt/install-prompt.component';
+import { IosInstallComponent } from '../ios-install/ios-install.component';
 
 interface NavItem {
   path: string;
@@ -15,7 +18,7 @@ interface NavItem {
 @Component({
   selector: 'app-app-shell',
   standalone: true,
-  imports: [CommonModule, RouterModule, BrandMarkComponent, ThemeToggleComponent],
+  imports: [CommonModule, RouterModule, BrandMarkComponent, ThemeToggleComponent, UpdateNotificationComponent, InstallPromptComponent, IosInstallComponent],
   templateUrl: './app-shell.component.html',
   styleUrls: ['./app-shell.component.scss'],
 })
