@@ -1,0 +1,38 @@
+<div class="bg-app-shell relative flex min-h-screen flex-col">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Header: brand mark (left) + theme toggle (right)
+  ════════════════════════════════════════════════════════════════ -->
+  <header class="auth-header">
+    <app-brand-mark />
+    <app-theme-toggle />
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Centred content area
+  ════════════════════════════════════════════════════════════════ -->
+  <main class="auth-main">
+    <div class="auth-container">
+
+      <!-- Title + optional subtitle -->
+      <div class="auth-heading">
+        <h1 class="auth-title">{{ title }}</h1>
+        @if (subtitle) {
+          <p class="auth-subtitle">{{ subtitle }}</p>
+        }
+      </div>
+
+      <!-- Glass card — content projected here -->
+      <div class="auth-card">
+        <ng-content />
+      </div>
+
+      <!-- Terms note -->
+      <p class="auth-footer-note">
+        By continuing, you agree to Schedify's Terms &amp; Privacy Policy.
+      </p>
+
+    </div>
+  </main>
+
+</div>

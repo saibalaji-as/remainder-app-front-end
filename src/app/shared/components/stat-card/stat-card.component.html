@@ -1,0 +1,41 @@
+<div class="stat-card">
+  <!-- Content row -->
+  <div class="stat-card__row">
+    <!-- Left: label, value, trend -->
+    <div class="stat-card__body">
+      <p class="stat-card__label">{{ label }}</p>
+      <p class="stat-card__value">{{ value }}</p>
+
+      @if (trend) {
+        <div class="stat-card__trend" [ngClass]="trendClass">
+          <!-- Up arrow -->
+          @if (trendDirection === 'up') {
+            <svg class="stat-card__trend-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17 17 7" /><path d="M7 7h10v10" />
+            </svg>
+          }
+          <!-- Down arrow -->
+          @if (trendDirection === 'down') {
+            <svg class="stat-card__trend-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 7 17 17" /><path d="M17 7v10H7" />
+            </svg>
+          }
+          <span>{{ trend }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Right: gradient icon chip -->
+    <div class="stat-card__chip" [ngClass]="chipClass">
+      <svg class="stat-card__chip-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path [attr.d]="icon" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Decorative orb -->
+  <div class="stat-card__orb"></div>
+</div>

@@ -1,0 +1,77 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// AuthShellComponent styles
+// All colours reference CSS custom properties — no hardcoded hex/rgb values.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem; // py-5 px-6
+
+  @media (min-width: 1024px) {
+    padding-inline: 2.5rem; // lg:px-10
+  }
+}
+
+// ── Main centred area ─────────────────────────────────────────────────────────
+
+.auth-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem; // py-10 px-4
+}
+
+// ── Inner container (max-w-md) ────────────────────────────────────────────────
+
+.auth-container {
+  width: 100%;
+  max-width: 28rem; // max-w-md = 448 px
+}
+
+// ── Title block ───────────────────────────────────────────────────────────────
+
+.auth-heading {
+  margin-block-end: 1.75rem; // mb-7
+  text-align: center;
+}
+
+.auth-title {
+  font-size: 1.875rem; // text-3xl
+  font-weight: 600;
+  letter-spacing: -0.025em; // tracking-tight
+  color: var(--foreground);
+  margin: 0;
+}
+
+.auth-subtitle {
+  margin-block-start: 0.5rem; // mt-2
+  font-size: 0.875rem; // text-sm
+  color: var(--muted-foreground);
+  margin-block-end: 0;
+}
+
+// ── Glass card ────────────────────────────────────────────────────────────────
+
+.auth-card {
+  border-radius: 1.5rem; // rounded-3xl
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: color-mix(in srgb, var(--card) 80%, transparent); // bg-card/80
+  padding: 1.75rem; // p-7
+  backdrop-filter: blur(20px); // backdrop-blur-xl
+  box-shadow: var(--shadow-elegant);
+}
+
+// ── Footer note ───────────────────────────────────────────────────────────────
+
+.auth-footer-note {
+  margin-block-start: 1.5rem; // mt-6
+  text-align: center;
+  font-size: 0.75rem; // text-xs
+  color: var(--muted-foreground);
+  margin-block-end: 0;
+}

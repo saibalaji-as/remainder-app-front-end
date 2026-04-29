@@ -1,0 +1,9 @@
+.skeleton-loader {
+  display: block;
+  background-color: var(--muted);
+  border-radius: 0.25rem; // rounded
+
+  &--rounded {
+    border-radius: 9999px; // pill / full-circle shape
+  }
+}

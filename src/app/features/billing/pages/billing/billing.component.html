@@ -1,68 +1,208 @@
-<div class="page-container">
-  <h1>Billing</h1>
+<app-app-shell>
+  <app-page-header title="Billing"></app-page-header>
 
-  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+  <!-- Loading skeletons -->
+  <ng-container *ngIf="loading">
+    <div class="billing-skeleton">
+      <div class="skeleton-hero"></div>
+    </div>
+  </ng-container>
 
   <ng-container *ngIf="!loading">
 
-    <!-- Active Subscription -->
-    <mat-card *ngIf="subscription" class="subscription-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar>workspace_premium</mat-icon>
-        <mat-card-title>Active Subscription</mat-card-title>
-        <mat-card-subtitle>Status: {{ subscription.status }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p><strong>Stripe Subscription ID:</strong> {{ subscription.stripeSubscriptionId }}</p>
-        <p><strong>Customer ID:</strong> {{ subscription.stripeCustomerId }}</p>
-        <p><strong>Since:</strong> {{ subscription.createdAt | date:'mediumDate' }}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-stroked-button color="warn" (click)="cancelSubscription()" [disabled]="cancelling">
-          <mat-icon>cancel</mat-icon>
-          {{ cancelling ? 'Cancelling...' : 'Cancel Subscription' }}
-        </button>
-      </mat-card-actions>
-    </mat-card>
+    <!-- ── Hero: Active Subscription ─────────────────────────────────────── -->
+    <div *ngIf="subscription" class="hero-card">
+      <!-- Decorative orb -->
+      <div class="hero-orb"></div>
 
-    <!-- No Subscription -->
-    <mat-card *ngIf="!subscription" class="no-subscription-card">
-      <mat-card-header>
-        <mat-icon mat-card-avatar>credit_card</mat-icon>
-        <mat-card-title>No Active Subscription</mat-card-title>
-        <mat-card-subtitle>Subscribe to start sending reminders</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-actions>
-        <button mat-flat-button color="primary" (click)="showSubscribeForm = !showSubscribeForm">
-          <mat-icon>add</mat-icon> Subscribe
-        </button>
-      </mat-card-actions>
-    </mat-card>
+      <div class="hero-card__inner">
+        <!-- Icon chip -->
+        <div class="hero-icon-chip">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
 
-    <!-- Subscribe Form -->
-    <mat-card *ngIf="showSubscribeForm" class="subscribe-form-card">
-      <mat-card-header><mat-card-title>New Subscription</mat-card-title></mat-card-header>
-      <mat-card-content>
+        <div class="hero-card__content">
+          <div class="hero-card__header">
+            <div>
+              <p class="hero-card__label">Current Plan</p>
+              <h2 class="hero-card__plan-name">{{ activePlanId | titlecase }}</h2>
+            </div>
+            <app-status-pill [status]="subscription.status"></app-status-pill>
+          </div>
+
+          <dl class="hero-detail-list">
+            <div class="hero-detail-item">
+              <dt>Subscription ID</dt>
+              <dd>{{ subscription.stripeSubscriptionId }}</dd>
+            </div>
+            <div class="hero-detail-item">
+              <dt>Customer ID</dt>
+              <dd>{{ subscription.stripeCustomerId }}</dd>
+            </div>
+            <div class="hero-detail-item">
+              <dt>Member since</dt>
+              <dd>{{ subscription.createdAt | date:'mediumDate' }}</dd>
+            </div>
+          </dl>
+
+          <div class="hero-card__actions">
+            <button class="btn btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Update payment
+            </button>
+            <button class="btn btn-danger-outline" (click)="cancelSubscription()" [disabled]="cancelling">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              {{ cancelling ? 'Cancelling...' : 'Cancel Subscription' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── No Subscription ───────────────────────────────────────────────── -->
+    <div *ngIf="!subscription" class="no-sub-card">
+      <div class="no-sub-card__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <h2 class="no-sub-card__title">No Active Subscription</h2>
+      <p class="no-sub-card__desc">Subscribe to start sending reminders</p>
+      <button class="btn btn-gradient" (click)="showSubscribeForm = !showSubscribeForm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Subscribe
+      </button>
+    </div>
+
+    <!-- ── Subscribe Form ────────────────────────────────────────────────── -->
+    <div *ngIf="showSubscribeForm" class="card subscribe-form-card">
+      <div class="card-header">
+        <h2 class="card-title">New Subscription</h2>
+      </div>
+      <div class="card-body">
         <form [formGroup]="subscribeForm" (ngSubmit)="subscribe()" class="form-grid">
-          <mat-form-field>
-            <mat-label>Stripe Price ID</mat-label>
-            <input matInput formControlName="priceId" placeholder="price_xxx">
-            <mat-error *ngIf="subscribeForm.get('priceId')?.hasError('required')">Required</mat-error>
-          </mat-form-field>
+          <div class="form-group">
+            <label class="form-label">Stripe Price ID</label>
+            <input class="form-input" formControlName="priceId" placeholder="price_xxx">
+            <span class="form-error"
+                  *ngIf="subscribeForm.get('priceId')?.hasError('required') && subscribeForm.get('priceId')?.touched">
+              Required
+            </span>
+          </div>
 
-          <mat-form-field>
-            <mat-label>Payment Method ID</mat-label>
-            <input matInput formControlName="paymentMethodId" placeholder="pm_xxx">
-            <mat-error *ngIf="subscribeForm.get('paymentMethodId')?.hasError('required')">Required</mat-error>
-          </mat-form-field>
+          <div class="form-group">
+            <label class="form-label">Payment Method ID</label>
+            <input class="form-input" formControlName="paymentMethodId" placeholder="pm_xxx">
+            <span class="form-error"
+                  *ngIf="subscribeForm.get('paymentMethodId')?.hasError('required') && subscribeForm.get('paymentMethodId')?.touched">
+              Required
+            </span>
+          </div>
 
           <div class="form-actions">
-            <button mat-flat-button color="primary" type="submit">Confirm</button>
-            <button mat-button type="button" (click)="showSubscribeForm = false">Cancel</button>
+            <button class="btn btn-gradient" type="submit">Confirm</button>
+            <button class="btn btn-secondary" type="button" (click)="showSubscribeForm = false">Cancel</button>
           </div>
         </form>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
+
+    <!-- ── Plan Comparison Grid ──────────────────────────────────────────── -->
+    <section class="plans-section">
+      <h3 class="section-title">Plans</h3>
+      <div class="plans-grid">
+        <div *ngFor="let plan of plans"
+             class="plan-card"
+             [class.plan-card--active]="plan.id === activePlanId">
+
+          <!-- "Current" badge for active plan -->
+          <div *ngIf="plan.id === activePlanId" class="plan-badge">Current</div>
+
+          <div class="plan-card__header">
+            <h4 class="plan-card__name">{{ plan.name }}</h4>
+            <div class="plan-card__price">
+              <span class="plan-card__amount">{{ plan.price }}</span>
+              <span class="plan-card__period">{{ plan.period }}</span>
+            </div>
+          </div>
+
+          <ul class="plan-card__features">
+            <li *ngFor="let feature of plan.features" class="plan-feature">
+              <!-- Check icon -->
+              <svg class="plan-feature__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              {{ feature }}
+            </li>
+          </ul>
+
+          <button class="btn"
+                  [class.btn-gradient]="plan.id === activePlanId"
+                  [class.btn-outline]="plan.id !== activePlanId">
+            {{ plan.id === activePlanId ? 'Current Plan' : 'Upgrade' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Invoices Table ────────────────────────────────────────────────── -->
+    <section class="invoices-section">
+      <h3 class="section-title">Invoices</h3>
+      <div class="table-wrapper">
+        <table class="data-table invoices-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let invoice of invoices" class="invoice-row">
+              <td class="invoice-id">{{ invoice.id }}</td>
+              <td>{{ invoice.date | date:'mediumDate' }}</td>
+              <td>{{ invoice.amount }}</td>
+              <td>
+                <app-status-pill [status]="invoice.status"></app-status-pill>
+              </td>
+              <td class="invoice-actions">
+                <button class="btn-icon" title="Download PDF" aria-label="Download PDF">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
   </ng-container>
-</div>
+</app-app-shell>

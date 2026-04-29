@@ -90,7 +90,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         (steps) => {
           component.steps = steps;
           fixture.detectChanges();
-          const stepEls = fixture.nativeElement.querySelectorAll('.step');
+          const stepEls = fixture.nativeElement.querySelectorAll('.step-card');
           expect(stepEls.length).toBe(steps.length);
         }
       ),
@@ -108,13 +108,14 @@ describe('LandingComponent — Property-Based Tests', () => {
             icon: fc.string({ minLength: 1 }),
             title: fc.string({ minLength: 1 }),
             desc: fc.string({ minLength: 1 }),
+            tint: fc.constantFrom('violet', 'fuchsia', 'cyan', 'indigo', 'emerald', 'amber'),
           }),
           { minLength: 1, maxLength: 12 }
         ),
         (features) => {
           component.features = features;
           fixture.detectChanges();
-          const cards = fixture.nativeElement.querySelectorAll('.feature-card');
+          const cards = fixture.nativeElement.querySelectorAll('.feat-card');
           expect(cards.length).toBe(features.length);
         }
       ),
@@ -130,6 +131,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         fc.array(
           fc.record({
             name: fc.string({ minLength: 1 }),
+            tagline: fc.string({ minLength: 1 }),
             price: fc.string({ minLength: 1 }),
             period: fc.constant('/mo'),
             popular: fc.boolean(),
@@ -140,7 +142,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         (plans) => {
           component.plans = plans;
           fixture.detectChanges();
-          const cards = fixture.nativeElement.querySelectorAll('.pricing-card');
+          const cards = fixture.nativeElement.querySelectorAll('.plan-card');
           expect(cards.length).toBe(plans.length);
         }
       ),
@@ -156,6 +158,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         fc.array(
           fc.record({
             name: fc.string({ minLength: 1 }),
+            tagline: fc.string({ minLength: 1 }),
             price: fc.string({ minLength: 1 }),
             period: fc.constant('/mo'),
             popular: fc.boolean(),
@@ -166,10 +169,10 @@ describe('LandingComponent — Property-Based Tests', () => {
         (plans) => {
           component.plans = plans;
           fixture.detectChanges();
-          const cards = fixture.nativeElement.querySelectorAll('.pricing-card');
+          const cards = fixture.nativeElement.querySelectorAll('.plan-card');
           plans.forEach((plan, i) => {
             if (plan.popular) {
-              expect(cards[i].classList).toContain('mat-elevation-z8');
+              expect(cards[i].classList).toContain('plan-card--popular');
             }
           });
         }
@@ -186,6 +189,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         fc.array(
           fc.record({
             name: fc.string({ minLength: 1 }),
+            tagline: fc.string({ minLength: 1 }),
             price: fc.string({ minLength: 1 }),
             period: fc.constant('/mo'),
             popular: fc.boolean(),
@@ -196,7 +200,7 @@ describe('LandingComponent — Property-Based Tests', () => {
         (plans) => {
           component.plans = plans;
           fixture.detectChanges();
-          const ctas = fixture.nativeElement.querySelectorAll('.pricing-card__cta');
+          const ctas = fixture.nativeElement.querySelectorAll('.plan-card__cta');
           expect(ctas.length).toBe(plans.length);
           ctas.forEach((el: Element) => {
             // routerLink directive renders as href in the DOM when router is provided
@@ -220,13 +224,14 @@ describe('LandingComponent — Property-Based Tests', () => {
             quote: fc.string({ minLength: 1 }),
             name: fc.string({ minLength: 1 }),
             business: fc.string({ minLength: 1 }),
+            tint: fc.constantFrom('violet', 'fuchsia', 'cyan', 'indigo', 'emerald', 'amber'),
           }),
           { minLength: 1, maxLength: 10 }
         ),
         (testimonials) => {
           component.testimonials = testimonials;
           fixture.detectChanges();
-          const cards = fixture.nativeElement.querySelectorAll('.testimonial-card');
+          const cards = fixture.nativeElement.querySelectorAll('.testi-card');
           expect(cards.length).toBe(testimonials.length);
         }
       ),
@@ -259,14 +264,14 @@ describe('LandingComponent — Property-Based Tests', () => {
 
   // Feature: schedify-landing-page, Property 11: CTA button directives
   // Validates: Requirements 12.5
-  it('Property 11: primary CTAs use mat-raised-button; secondary CTAs use mat-stroked-button', () => {
-    const raisedButtons = fixture.nativeElement.querySelectorAll('[mat-raised-button]');
-    const strokedButtons = fixture.nativeElement.querySelectorAll('[mat-stroked-button]');
+  it('Property 11: primary CTAs use btn-gradient class; secondary CTAs use btn-glass or nav__login class', () => {
+    const gradientButtons = fixture.nativeElement.querySelectorAll('.btn-gradient, .plan-card__cta--gradient, .cta-box__btn');
+    const secondaryButtons = fixture.nativeElement.querySelectorAll('.btn-glass, .nav__login');
 
-    // Start Free Trial, Get Started Free, pricing CTAs (3), Start Free Today = at least 4
-    expect(raisedButtons.length).toBeGreaterThanOrEqual(4);
+    // Start free trial, Get Started (pricing CTAs), Start Free Today = at least 2
+    expect(gradientButtons.length).toBeGreaterThanOrEqual(2);
 
-    // Login, See How It Works = at least 2
-    expect(strokedButtons.length).toBeGreaterThanOrEqual(2);
+    // Login, See how it works = at least 2
+    expect(secondaryButtons.length).toBeGreaterThanOrEqual(2);
   });
 });

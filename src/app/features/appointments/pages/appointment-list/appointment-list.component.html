@@ -1,97 +1,219 @@
-<div class="page-container">
-  <div class="flex-row">
-    <h1>Appointments</h1>
-    <span class="spacer"></span>
-    <button mat-flat-button color="primary" (click)="showAddForm = !showAddForm">
-      <mat-icon>add</mat-icon> New Appointment
-    </button>
+<app-app-shell>
+
+  <!-- ── Page header ──────────────────────────────────────────────────────── -->
+  <app-page-header title="Appointments">
+    <ng-container actions>
+      <button class="btn-gradient-pill" (click)="showAddForm = !showAddForm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        New Appointment
+      </button>
+    </ng-container>
+  </app-page-header>
+
+  <!-- ── Add Appointment Form ─────────────────────────────────────────────── -->
+  @if (showAddForm) {
+    <div class="form-card">
+      <div class="form-card__header">
+        <h2 class="form-card__title">New Appointment</h2>
+      </div>
+      <div class="form-card__body">
+        <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label">Contact</label>
+            <select class="form-input form-select" formControlName="contactId">
+              <option [value]="null" disabled>Select a contact</option>
+              <option *ngFor="let c of contacts" [value]="c.id">{{ c.name }}</option>
+            </select>
+            @if (addForm.get('contactId')?.hasError('required') && addForm.get('contactId')?.touched) {
+              <span class="form-error">Required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-input" formControlName="title" placeholder="e.g. Annual checkup">
+            @if (addForm.get('title')?.hasError('required') && addForm.get('title')?.touched) {
+              <span class="form-error">Required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date &amp; Time</label>
+            <input class="form-input" type="datetime-local" formControlName="scheduledAt">
+            @if (addForm.get('scheduledAt')?.hasError('required') && addForm.get('scheduledAt')?.touched) {
+              <span class="form-error">Required</span>
+            }
+            @if (addForm.get('scheduledAt')?.hasError('pastDate')) {
+              <span class="form-error">Cannot be in the past</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Reminder Channel</label>
+            <select class="form-input form-select" formControlName="reminderChannel">
+              <option *ngFor="let ch of reminderChannels" [value]="ch.value">{{ ch.label }}</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-gradient-pill" type="submit">Save</button>
+            <button class="btn-ghost" type="button" (click)="showAddForm = false">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── Status tab bar ───────────────────────────────────────────────────── -->
+  <div class="tab-bar">
+    @for (tab of tabs; track tab) {
+      <button
+        class="tab-bar__tab"
+        [class.tab-bar__tab--active]="activeTab === tab"
+        (click)="activeTab = tab">
+        <span class="tab-bar__label">
+          {{ tab === 'All' ? 'All' : (tab.charAt(0).toUpperCase() + tab.slice(1)) }}
+        </span>
+        <span class="tab-bar__badge" [class.tab-bar__badge--active]="activeTab === tab">
+          {{ tabCount(tab) }}
+        </span>
+      </button>
+    }
   </div>
 
-  <!-- Add Appointment Form -->
-  <mat-card *ngIf="showAddForm" class="add-form-card">
-    <mat-card-header><mat-card-title>New Appointment</mat-card-title></mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="form-grid">
-
-        <mat-form-field>
-          <mat-label>Contact</mat-label>
-          <mat-select formControlName="contactId">
-            <mat-option *ngFor="let c of contacts" [value]="c.id">{{ c.name }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="addForm.get('contactId')?.hasError('required')">Required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="e.g. Annual checkup">
-          <mat-error *ngIf="addForm.get('title')?.hasError('required')">Required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Date & Time</mat-label>
-          <input matInput type="datetime-local" formControlName="scheduledAt">
-          <mat-error *ngIf="addForm.get('scheduledAt')?.hasError('required')">Required</mat-error>
-          <mat-error *ngIf="addForm.get('scheduledAt')?.hasError('pastDate')">Cannot be in the past</mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Reminder Channel</mat-label>
-          <mat-select formControlName="reminderChannel">
-            <mat-option *ngFor="let ch of reminderChannels" [value]="ch.value">{{ ch.label }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button mat-flat-button color="primary" type="submit">Save</button>
-          <button mat-button type="button" (click)="showAddForm = false">Cancel</button>
+  <!-- ── Loading skeletons ─────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="skeleton-table">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="skeleton-row">
+          <app-skeleton-loader width="35%" height="1rem"></app-skeleton-loader>
+          <app-skeleton-loader [rounded]="true" width="2rem" height="2rem"></app-skeleton-loader>
+          <app-skeleton-loader width="25%" height="1rem"></app-skeleton-loader>
+          <app-skeleton-loader width="20%" height="1rem"></app-skeleton-loader>
+          <app-skeleton-loader width="10%" height="1.5rem" [rounded]="true"></app-skeleton-loader>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      }
+    </div>
+  }
 
-  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+  <!-- ── Empty state ───────────────────────────────────────────────────────── -->
+  @if (!loading && filteredAppointments.length === 0) {
+    <app-empty-state
+      title="No appointments found"
+      [description]="activeTab === 'All' ? 'Create your first appointment to get started.' : 'No ' + activeTab + ' appointments.'"
+      icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z">
+      <ng-container action>
+        @if (activeTab === 'All') {
+          <button class="btn-gradient-pill" (click)="showAddForm = true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Appointment
+          </button>
+        }
+      </ng-container>
+    </app-empty-state>
+  }
 
-  <mat-table [dataSource]="appointments" *ngIf="!loading">
-    <ng-container matColumnDef="title">
-      <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
-      <mat-cell *matCellDef="let a">{{ a.title }}</mat-cell>
-    </ng-container>
+  <!-- ── Desktop table (≥768px) ────────────────────────────────────────────── -->
+  @if (!loading && filteredAppointments.length > 0) {
+    <div class="appt-table-wrap">
+      <table class="appt-table">
+        <thead>
+          <tr>
+            <th class="col-title">Title</th>
+            <th class="col-contact">Contact</th>
+            <th class="col-scheduled">Scheduled</th>
+            <th class="col-channel">Channel</th>
+            <th class="col-status">Status</th>
+            <th class="col-actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of filteredAppointments; track a.id) {
+            <tr class="appt-table__row">
+              <td class="col-title appt-title">{{ a.title }}</td>
+              <td class="col-contact">
+                <div class="contact-cell">
+                  <div class="contact-avatar" aria-hidden="true">
+                    {{ getInitial(getContactName(a)) }}
+                  </div>
+                  <span class="contact-name">{{ getContactName(a) }}</span>
+                </div>
+              </td>
+              <td class="col-scheduled appt-date">{{ formatDateTime(a.scheduledAt) }}</td>
+              <td class="col-channel">
+                <app-channel-chip [channel]="a.reminderChannel"></app-channel-chip>
+              </td>
+              <td class="col-status">
+                <app-status-pill [status]="a.status"></app-status-pill>
+              </td>
+              <td class="col-actions">
+                <button class="btn-icon-sm" aria-label="View appointment">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                <button class="btn-icon-danger" aria-label="Delete appointment" (click)="deleteAppointment(a)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/><path d="M14 11v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-    <ng-container matColumnDef="contact">
-      <mat-header-cell *matHeaderCellDef>Contact</mat-header-cell>
-      <mat-cell *matCellDef="let a">{{ getContactName(a) }}</mat-cell>
-    </ng-container>
+    <!-- ── Mobile cards (<768px) ─────────────────────────────────────────── -->
+    <div class="mobile-cards">
+      @for (a of filteredAppointments; track a.id) {
+        <div class="mobile-card">
+          <div class="mobile-card__header">
+            <div class="mobile-card__title">{{ a.title }}</div>
+            <app-status-pill [status]="a.status"></app-status-pill>
+          </div>
+          <div class="mobile-card__contact">
+            <div class="contact-avatar contact-avatar--sm" aria-hidden="true">
+              {{ getInitial(getContactName(a)) }}
+            </div>
+            <span class="mobile-card__contact-name">{{ getContactName(a) }}</span>
+          </div>
+          <div class="mobile-card__meta">
+            <span class="mobile-card__date">{{ formatDateTime(a.scheduledAt) }}</span>
+            <app-channel-chip [channel]="a.reminderChannel"></app-channel-chip>
+          </div>
+          <div class="mobile-card__actions">
+            <button class="btn-icon-danger" aria-label="Delete appointment" (click)="deleteAppointment(a)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
 
-    <ng-container matColumnDef="scheduledAt">
-      <mat-header-cell *matHeaderCellDef>Scheduled</mat-header-cell>
-      <mat-cell *matCellDef="let a">{{ a.scheduledAt | date:'medium' }}</mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="reminderChannel">
-      <mat-header-cell *matHeaderCellDef>Channel</mat-header-cell>
-      <mat-cell *matCellDef="let a">{{ a.reminderChannel | uppercase }}</mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="status">
-      <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-      <mat-cell *matCellDef="let a">
-        <span [class]="'status-chip status-' + a.status">{{ a.status }}</span>
-      </mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef></mat-header-cell>
-      <mat-cell *matCellDef="let a">
-        <button mat-icon-button aria-label="View appointment">
-          <mat-icon>visibility</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" aria-label="Delete appointment" (click)="deleteAppointment(a)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
-
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
-</div>
+</app-app-shell>

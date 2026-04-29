@@ -1,20 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { DialogService } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Contact, ContactCreateDto } from '../../../../core/models/contact.model';
+import {
+  AppShellComponent,
+  PageHeaderComponent,
+  StatusPillComponent,
+  SkeletonLoaderComponent,
+  EmptyStateComponent,
+} from '../../../../shared/components/index';
 
 @Component({
   selector: 'app-contact-list',
@@ -22,15 +20,11 @@ import { Contact, ContactCreateDto } from '../../../../core/models/contact.model
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatTableModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatDialogModule,
-    MatPaginatorModule,
-    LoadingSpinnerComponent
+    AppShellComponent,
+    PageHeaderComponent,
+    StatusPillComponent,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './contact-list.component.html',
   styleUrls: ['./contact-list.component.scss']
@@ -38,7 +32,6 @@ import { Contact, ContactCreateDto } from '../../../../core/models/contact.model
 export class ContactListComponent implements OnInit, OnDestroy {
   contacts: Contact[] = [];
   filteredContacts: Contact[] = [];
-  displayedColumns = ['name', 'email', 'phone', 'actions'];
   loading = false;
   showAddForm = false;
   csvPreviewRows: string[][] = [];
@@ -61,7 +54,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private api: ApiService,
     private toast: ToastService,
-    private dialog: MatDialog
+    private dialog: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -108,9 +101,13 @@ export class ContactListComponent implements OnInit, OnDestroy {
     return this.filteredContacts.slice(start, start + this.pageSize);
   }
 
-  onPage(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
+  prevPage(): void { if (this.pageIndex > 0) this.pageIndex--; }
+  nextPage(): void { if ((this.pageIndex + 1) * this.pageSize < this.filteredContacts.length) this.pageIndex++; }
+
+  min(a: number, b: number): number { return Math.min(a, b); }
+
+  getInitial(name: string): string {
+    return name ? name.charAt(0).toUpperCase() : '?';
   }
 
   submitAdd(): void {
@@ -128,8 +125,10 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   deleteContact(contact: Contact): void {
-    const ref = this.dialog.open(ConfirmDialogComponent, {
-      data: { title: 'Delete Contact', message: `Delete ${contact.name}?`, confirmLabel: 'Delete' }
+    const ref = this.dialog.open({
+      title: 'Delete Contact',
+      message: `Delete ${contact.name}?`,
+      confirmLabel: 'Delete'
     });
     ref.afterClosed().subscribe(confirmed => {
       if (confirmed) {
@@ -155,7 +154,6 @@ export class ContactListComponent implements OnInit, OnDestroy {
   }
 
   confirmCsvImport(): void {
-    // Bulk import: POST each row as a contact
     const nameIdx = this.csvHeaders.findIndex(h => h.toLowerCase() === 'name');
     const emailIdx = this.csvHeaders.findIndex(h => h.toLowerCase() === 'email');
     const phoneIdx = this.csvHeaders.findIndex(h => h.toLowerCase() === 'phone');

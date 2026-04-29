@@ -1,0 +1,259 @@
+<div class="bg-app-shell min-h-screen">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Desktop sidebar (visible lg+, hidden below 1024 px)
+  ════════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar-desktop">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <app-brand-mark />
+    </div>
+
+    <!-- Nav section label -->
+    <p class="sidebar-section-label">Workspace</p>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="nav-item--active"
+          [routerLinkActiveOptions]="item.path === '/dashboard' ? { exact: true } : { exact: false }"
+          class="nav-item"
+          (click)="closeDrawer()"
+          [attr.aria-label]="item.label"
+        >
+          <!-- Active background pill -->
+          <span class="nav-item__bg bg-gradient-primary shadow-glow" aria-hidden="true"></span>
+
+          <!-- Icon -->
+          <span class="nav-item__icon" aria-hidden="true">
+            @switch (item.icon) {
+              @case ('dashboard') {
+                <!-- Calendar / LayoutDashboard icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="7" height="9" x="3" y="3" rx="1" />
+                  <rect width="7" height="5" x="14" y="3" rx="1" />
+                  <rect width="7" height="9" x="14" y="12" rx="1" />
+                  <rect width="7" height="5" x="3" y="16" rx="1" />
+                </svg>
+              }
+              @case ('contacts') {
+                <!-- Users icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              }
+              @case ('appointments') {
+                <!-- Clock icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              }
+              @case ('reminders') {
+                <!-- Bell icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+              }
+              @case ('billing') {
+                <!-- CreditCard icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="14" x="2" y="5" rx="2" />
+                  <line x1="2" x2="22" y1="10" y2="10" />
+                </svg>
+              }
+            }
+          </span>
+
+          <span class="nav-item__label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <!-- Plan summary card -->
+    <div class="plan-card">
+      <div class="plan-card__inner">
+        <p class="plan-card__name">Pro plan</p>
+        <p class="plan-card__desc">Unlimited reminders &amp; analytics</p>
+        <a
+          routerLink="/billing"
+          class="plan-card__cta bg-gradient-primary shadow-glow"
+        >
+          Manage plan
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Mobile drawer (overlay, shown when drawerOpen is true)
+  ════════════════════════════════════════════════════════════════ -->
+  @if (drawerOpen) {
+    <div
+      class="drawer-backdrop"
+      (click)="closeDrawer()"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
+    >
+      <aside
+        class="drawer-panel"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Drawer header -->
+        <div class="drawer-header">
+          <app-brand-mark />
+          <button
+            type="button"
+            class="drawer-close"
+            (click)="closeDrawer()"
+            aria-label="Close navigation menu"
+          >
+            <!-- X icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Drawer nav -->
+        <nav class="sidebar-nav" aria-label="Main navigation">
+          @for (item of navItems; track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="nav-item--active"
+              [routerLinkActiveOptions]="item.path === '/dashboard' ? { exact: true } : { exact: false }"
+              class="nav-item"
+              (click)="closeDrawer()"
+              [attr.aria-label]="item.label"
+            >
+              <span class="nav-item__bg bg-gradient-primary shadow-glow" aria-hidden="true"></span>
+
+              <span class="nav-item__icon" aria-hidden="true">
+                @switch (item.icon) {
+                  @case ('dashboard') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect width="7" height="9" x="3" y="3" rx="1" />
+                      <rect width="7" height="5" x="14" y="3" rx="1" />
+                      <rect width="7" height="9" x="14" y="12" rx="1" />
+                      <rect width="7" height="5" x="3" y="16" rx="1" />
+                    </svg>
+                  }
+                  @case ('contacts') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  }
+                  @case ('appointments') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  }
+                  @case ('reminders') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                    </svg>
+                  }
+                  @case ('billing') {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect width="20" height="14" x="2" y="5" rx="2" />
+                      <line x1="2" x2="22" y1="10" y2="10" />
+                    </svg>
+                  }
+                }
+              </span>
+
+              <span class="nav-item__label">{{ item.label }}</span>
+            </a>
+          }
+        </nav>
+      </aside>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════
+       Main column (offset by sidebar width on lg+)
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="main-column">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar__inner">
+        <!-- Left: hamburger (mobile) + brand (mobile) -->
+        <div class="topbar__left">
+          <button
+            type="button"
+            class="topbar__hamburger"
+            (click)="openDrawer()"
+            aria-label="Open navigation menu"
+          >
+            <!-- Menu / hamburger icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="6" y2="6" />
+              <line x1="4" x2="20" y1="18" y2="18" />
+            </svg>
+          </button>
+
+          <div class="topbar__brand-mobile">
+            <app-brand-mark [size]="32" />
+          </div>
+        </div>
+
+        <!-- Right: theme toggle + logout -->
+        <div class="topbar__right">
+          <app-theme-toggle />
+
+          <button
+            type="button"
+            class="topbar__logout"
+            (click)="logout()"
+          >
+            <!-- LogOut icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content">
+      <ng-content />
+    </main>
+
+  </div>
+
+</div>

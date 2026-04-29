@@ -2,13 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ToastService } from '../../../../shared/services/toast.service';
+import { AuthShellComponent } from '../../../../shared/components/auth-shell/auth-shell.component';
 
 @Component({
   selector: 'app-login',
@@ -17,11 +12,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule
+    AuthShellComponent
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -34,22 +25,23 @@ export class LoginComponent {
 
   loading = false;
   hidePassword = true;
+  error: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private toast: ToastService,
     private router: Router
   ) {}
 
   submit(): void {
     if (this.form.invalid) return;
     this.loading = true;
+    this.error = null;
     const { email, password } = this.form.value;
     this.authService.login({ email: email!, password: password! }).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
-        this.toast.error(err?.error?.message ?? 'Login failed. Please check your credentials.');
+        this.error = err?.error?.message ?? 'Login failed. Please check your credentials.';
         this.loading = false;
       }
     });

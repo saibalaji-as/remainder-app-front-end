@@ -1,0 +1,28 @@
+<div class="brand-mark">
+  <!-- Icon container with gradient background -->
+  <div
+    class="brand-mark__icon bg-gradient-primary shadow-glow"
+    [style.width.px]="size"
+    [style.height.px]="size"
+  >
+    <!-- Schedify bell SVG icon -->
+    <svg
+      [attr.width]="iconSize"
+      [attr.height]="iconSize"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="brand-mark__bell"
+      aria-hidden="true"
+    >
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
+  </div>
+
+  <!-- Wordmark -->
+  <span class="brand-mark__wordmark text-gradient-primary">Schedify</span>
+</div>

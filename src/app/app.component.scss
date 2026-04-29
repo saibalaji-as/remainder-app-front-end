@@ -1,21 +1,2 @@
-mat-sidenav-container {
-  height: calc(100vh - 64px);
-}
-
-mat-sidenav {
-  width: 220px;
-  padding-top: 8px;
-}
-
-mat-sidenav-content {
-  overflow-y: auto;
-}
-
-.active-link {
-  background-color: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
+// AppComponent is a thin router-outlet wrapper.
+// All layout styles live in AppShellComponent and AuthShellComponent.

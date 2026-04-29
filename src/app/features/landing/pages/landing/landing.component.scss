@@ -1,45 +1,25 @@
 :host {
-  // ─── Design Tokens ──────────────────────────────────────────────────────────
-  --background:        oklch(0.12 0.04 280);
-  --foreground:        oklch(0.98 0.01 280);
-  --muted-foreground:  oklch(0.72 0.03 280);
-  --accent:            oklch(0.78 0.15 210);
-  --border:            oklch(1 0 0 / 10%);
-  --card:              oklch(0.17 0.04 280);
-
-  --gradient-brand: linear-gradient(135deg, oklch(0.62 0.24 300) 0%, oklch(0.68 0.26 350) 50%, oklch(0.78 0.15 210) 100%);
-  --gradient-text:  linear-gradient(135deg, oklch(0.82 0.18 300), oklch(0.78 0.22 350), oklch(0.86 0.15 210));
-
-  --shadow-glow:      0 20px 60px -20px oklch(0.62 0.24 300 / 0.55);
-  --shadow-glow-pink: 0 20px 60px -20px oklch(0.68 0.26 350 / 0.5);
-  --shadow-card:      0 10px 40px -15px oklch(0 0 0 / 0.6);
-
   // ─── Host Layout & Background ───────────────────────────────────────────────
   display: block;
   background-color: var(--background);
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
-
-  background-image:
-    radial-gradient(ellipse 80% 50% at 20% 0%, oklch(0.62 0.24 300 / 0.18), transparent),
-    radial-gradient(ellipse 80% 50% at 80% 0%, oklch(0.68 0.26 350 / 0.16), transparent);
-  background-attachment: fixed;
 }
 
 // ─── Glassmorphism Placeholders ─────────────────────────────────────────────
 %glass {
-  background: color-mix(in oklab, white 4%, transparent);
+  background: color-mix(in oklch, var(--card) 60%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in oklab, white 10%, transparent);
+  border: 1px solid var(--border);
 }
 
 %glass-strong {
-  background: color-mix(in oklab, white 7%, transparent);
+  background: color-mix(in oklch, var(--card) 80%, transparent);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid color-mix(in oklab, white 14%, transparent);
+  border: 1px solid var(--border);
 }
 
 // ─── Keyframe Animations ────────────────────────────────────────────────────
@@ -76,7 +56,7 @@
 
 // ─── Shared Utilities ────────────────────────────────────────────────────────
 .grad-text {
-  background: var(--gradient-text);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -98,7 +78,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--primary);
   margin-bottom: 12px;
 }
 
@@ -141,7 +121,7 @@
   align-items: center;
   gap: 8px;
   padding: 14px 28px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
@@ -153,7 +133,7 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: var(--shadow-glow-pink);
+    box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
 
     .btn-arrow {
@@ -181,7 +161,7 @@
   transition: background 0.2s ease;
 
   &:hover {
-    background: color-mix(in oklab, white 10%, transparent);
+    background: var(--accent);
   }
 }
 
@@ -244,7 +224,7 @@
 
   &--scrolled {
     @extend %glass-strong;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-elegant);
   }
 }
 
@@ -263,7 +243,7 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   box-shadow: var(--shadow-glow);
   display: flex;
   align-items: center;
@@ -299,7 +279,7 @@
 
   &:hover {
     color: var(--foreground);
-    background: color-mix(in oklab, white 6%, transparent);
+    background: var(--accent);
   }
 }
 
@@ -329,7 +309,7 @@
 
 .nav__cta {
   padding: 8px 16px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   color: #fff;
   font-size: 0.875rem;
   font-weight: 600;
@@ -339,7 +319,7 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: var(--shadow-glow-pink);
+    box-shadow: var(--shadow-glow);
     transform: translateY(-1px);
   }
 }
@@ -359,7 +339,7 @@
   transition: background 0.15s ease;
 
   &:hover {
-    background: color-mix(in oklab, white 8%, transparent);
+    background: var(--accent);
   }
 
   @media (min-width: 768px) {
@@ -392,14 +372,14 @@
 
   &:hover {
     color: var(--foreground);
-    background: color-mix(in oklab, white 6%, transparent);
+    background: var(--accent);
   }
 }
 
 .nav__mobile-cta {
   margin-top: 4px;
   padding: 12px 16px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 600;
@@ -410,7 +390,7 @@
   transition: box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: var(--shadow-glow-pink);
+    box-shadow: var(--shadow-glow);
   }
 }
 
@@ -444,7 +424,7 @@
   height: 520px;
   top: -100px;
   left: -100px;
-  background: radial-gradient(closest-side, oklch(0.62 0.24 300 / 0.9), transparent 70%);
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--primary) 90%, transparent), transparent 70%);
   animation: drift 18s ease-in-out infinite;
 }
 
@@ -453,7 +433,7 @@
   height: 560px;
   top: -120px;
   right: -120px;
-  background: radial-gradient(closest-side, oklch(0.68 0.26 350 / 0.85), transparent 70%);
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--primary-glow) 85%, transparent), transparent 70%);
   animation: drift-reverse 22s ease-in-out infinite;
 }
 
@@ -463,7 +443,7 @@
   top: 30%;
   left: 40%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(closest-side, oklch(0.78 0.15 210 / 0.75), transparent 70%);
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--info) 75%, transparent), transparent 70%);
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
@@ -471,8 +451,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(1 0 0 / 0.06) 1px, transparent 1px);
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
@@ -570,7 +550,7 @@
 .phone-glow {
   position: absolute;
   inset: -40px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   filter: blur(60px);
   opacity: 0.5;
   border-radius: 3rem;
@@ -582,14 +562,14 @@
   max-width: 300px;
   width: 100%;
   border-radius: 2.5rem;
-  border: 1px solid color-mix(in oklab, white 15%, transparent);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-elegant);
   animation: float 8s ease-in-out infinite;
   transform: rotate(-4deg);
 }
 
 .phone__screen {
-  background: oklch(0.14 0.04 280);
+  background: var(--sidebar);
   aspect-ratio: 9 / 19;
   border-radius: 2rem;
   overflow: hidden;
@@ -603,7 +583,7 @@
   width: 112px;
   height: 24px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.7);
+  background: color-mix(in oklch, var(--sidebar) 70%, transparent);
   margin: 0 auto 4px;
   flex-shrink: 0;
 }
@@ -618,7 +598,8 @@
 
 .phone__time {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--sidebar-foreground);
+  opacity: 0.6;
   font-weight: 600;
 }
 
@@ -627,7 +608,8 @@
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--sidebar-foreground);
+  opacity: 0.6;
   font-weight: 600;
 }
 
@@ -649,7 +631,7 @@
 
 .phone__fade {
   height: 80px;
-  background: linear-gradient(to top, oklch(0.14 0.04 280), transparent);
+  background: linear-gradient(to top, var(--sidebar), transparent);
   margin-top: -80px;
   flex-shrink: 0;
   pointer-events: none;
@@ -663,18 +645,18 @@
 }
 
 .msg--sms {
-  border: 1px solid oklch(0.62 0.24 300 / 0.3);
-  background: linear-gradient(135deg, oklch(0.62 0.24 300 / 0.15), oklch(0.68 0.26 350 / 0.1));
+  border: 1px solid color-mix(in oklch, var(--primary) 30%, transparent);
+  background: linear-gradient(135deg, color-mix(in oklch, var(--primary) 15%, transparent), color-mix(in oklch, var(--primary-glow) 10%, transparent));
 }
 
 .msg--email {
-  border: 1px solid oklch(0.78 0.15 210 / 0.3);
-  background: linear-gradient(135deg, oklch(0.78 0.15 210 / 0.15), oklch(0.7 0.18 220 / 0.1));
+  border: 1px solid color-mix(in oklch, var(--info) 30%, transparent);
+  background: linear-gradient(135deg, color-mix(in oklch, var(--info) 15%, transparent), color-mix(in oklch, var(--info) 10%, transparent));
 }
 
 .msg--confirm {
-  border: 1px solid oklch(0.7 0.2 160 / 0.4);
-  background: linear-gradient(135deg, oklch(0.7 0.2 160 / 0.15), oklch(0.72 0.18 180 / 0.1));
+  border: 1px solid color-mix(in oklch, var(--success) 40%, transparent);
+  background: linear-gradient(135deg, color-mix(in oklch, var(--success) 15%, transparent), color-mix(in oklch, var(--success) 10%, transparent));
 }
 
 .msg__header {
@@ -696,29 +678,31 @@
   border-radius: 999px;
 
   .msg--sms & {
-    background: oklch(0.62 0.24 300 / 0.3);
-    color: oklch(0.82 0.18 300);
+    background: color-mix(in oklch, var(--primary) 30%, transparent);
+    color: var(--primary);
   }
 
   .msg--email & {
-    background: oklch(0.78 0.15 210 / 0.3);
-    color: oklch(0.86 0.15 210);
+    background: color-mix(in oklch, var(--info) 30%, transparent);
+    color: var(--info);
   }
 
   .msg--confirm & {
-    background: oklch(0.7 0.2 160 / 0.3);
-    color: oklch(0.82 0.18 160);
+    background: color-mix(in oklch, var(--success) 30%, transparent);
+    color: var(--success);
   }
 }
 
 .msg__time {
   font-size: 9px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--sidebar-foreground);
+  opacity: 0.4;
 }
 
 .msg__body {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sidebar-foreground);
+  opacity: 0.8;
   line-height: 1.5;
   margin: 0;
 }
@@ -726,8 +710,8 @@
 // ─── Logo Cloud ──────────────────────────────────────────────────────────────
 .logocloud {
   padding: 40px 0;
-  border-top: 1px solid color-mix(in oklab, white 5%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, white 5%, transparent);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .logocloud__label {
@@ -809,7 +793,7 @@
   right: -24px;
   width: 192px;
   height: 192px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   filter: blur(40px);
   opacity: 0;
   border-radius: 50%;
@@ -877,7 +861,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  border: 1px solid color-mix(in oklab, white 10%, transparent);
+  border: 1px solid var(--border);
 
   .material-icons {
     font-size: 20px;
@@ -886,27 +870,27 @@
 }
 
 .feat-card--violet .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.62 0.24 300), oklch(0.68 0.26 350));
+  background: var(--gradient-primary);
 }
 
 .feat-card--fuchsia .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.68 0.26 350), oklch(0.72 0.24 10));
+  background: linear-gradient(135deg, var(--primary-glow), var(--primary));
 }
 
 .feat-card--cyan .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.78 0.15 210), oklch(0.72 0.18 220));
+  background: linear-gradient(135deg, var(--info), color-mix(in oklch, var(--info) 80%, var(--primary)));
 }
 
 .feat-card--indigo .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.55 0.22 270), oklch(0.62 0.24 300));
+  background: linear-gradient(135deg, color-mix(in oklch, var(--primary) 80%, var(--info)), var(--primary));
 }
 
 .feat-card--emerald .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.7 0.2 160), oklch(0.72 0.18 180));
+  background: linear-gradient(135deg, var(--success), color-mix(in oklch, var(--success) 80%, var(--info)));
 }
 
 .feat-card--amber .feat-card__icon-wrap {
-  background: linear-gradient(135deg, oklch(0.78 0.18 80), oklch(0.75 0.2 60));
+  background: linear-gradient(135deg, var(--warning), color-mix(in oklch, var(--warning) 80%, var(--destructive)));
 }
 
 .feat-card__title {
@@ -952,9 +936,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      oklch(0.62 0.24 300 / 0.6),
-      oklch(0.68 0.26 350 / 0.6),
-      oklch(0.78 0.15 210 / 0.6),
+      color-mix(in oklch, var(--primary) 60%, transparent),
+      color-mix(in oklch, var(--primary-glow) 60%, transparent),
+      color-mix(in oklch, var(--info) 60%, transparent),
       transparent
     );
     pointer-events: none;
@@ -973,7 +957,7 @@
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   box-shadow: var(--shadow-glow);
   display: flex;
   align-items: center;
@@ -989,7 +973,7 @@
 .step-card__num {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--primary);
   font-family: ui-monospace, monospace;
   margin-bottom: 8px;
 }
@@ -1043,7 +1027,7 @@
   inset: 0;
   border-radius: 25px;
   padding: 1.5px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -1060,7 +1044,7 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
@@ -1123,7 +1107,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1141,12 +1125,12 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
 
   &--gradient {
-    background: var(--gradient-brand);
+    background: var(--gradient-primary);
     color: #fff;
     box-shadow: var(--shadow-glow);
 
     &:hover {
-      box-shadow: var(--shadow-glow-pink);
+      box-shadow: var(--shadow-glow);
       transform: translateY(-1px);
     }
   }
@@ -1156,7 +1140,7 @@
     color: var(--foreground);
 
     &:hover {
-      background: color-mix(in oklab, white 10%, transparent);
+      background: var(--accent);
     }
   }
 }
@@ -1199,7 +1183,8 @@
 .testi-card__quote {
   font-size: 0.9rem;
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
+  opacity: 0.9;
   flex: 1;
   margin: 0 0 20px;
 }
@@ -1223,15 +1208,15 @@
   flex-shrink: 0;
 
   &--violet {
-    background: linear-gradient(135deg, oklch(0.62 0.24 300), oklch(0.68 0.26 350));
+    background: var(--gradient-primary);
   }
 
   &--fuchsia {
-    background: linear-gradient(135deg, oklch(0.68 0.26 350), oklch(0.72 0.24 10));
+    background: linear-gradient(135deg, var(--primary-glow), var(--primary));
   }
 
   &--cyan {
-    background: linear-gradient(135deg, oklch(0.78 0.15 210), oklch(0.72 0.18 220));
+    background: linear-gradient(135deg, var(--info), color-mix(in oklch, var(--info) 80%, var(--primary)));
   }
 }
 
@@ -1287,7 +1272,7 @@
   transition: background 0.15s ease;
 
   &:hover {
-    background: color-mix(in oklab, white 4%, transparent);
+    background: var(--accent);
   }
 }
 
@@ -1340,14 +1325,14 @@
 .cta-box__bg {
   position: absolute;
   inset: 0;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   opacity: 0.95;
 }
 
 .cta-box__overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255,255,255,0.3), transparent);
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, color-mix(in oklch, var(--background) 30%, transparent), transparent);
   opacity: 0.3;
   mix-blend-mode: overlay;
   pointer-events: none;
@@ -1357,8 +1342,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    linear-gradient(color-mix(in oklch, var(--background) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--background) 10%, transparent) 1px, transparent 1px);
   background-size: 40px 40px;
   opacity: 0.1;
   pointer-events: none;
@@ -1378,7 +1363,7 @@
 
 .cta-box__sub {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: color-mix(in oklch, var(--background) 85%, transparent);
   max-width: 480px;
   margin: 0 auto 32px;
   line-height: 1.7;
@@ -1390,7 +1375,7 @@
   gap: 8px;
   padding: 14px 28px;
   background: #fff;
-  color: oklch(0.2 0.08 300);
+  color: var(--primary);
   font-size: 0.95rem;
   font-weight: 700;
   border-radius: 12px;
@@ -1399,7 +1384,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px color-mix(in oklch, var(--background) 20%, transparent);
 
     .btn-arrow {
       transform: translateX(3px);
@@ -1414,12 +1399,12 @@
 .cta-box__note {
   margin: 16px 0 0;
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: color-mix(in oklch, var(--background) 70%, transparent);
 }
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 .footer {
-  border-top: 1px solid color-mix(in oklab, white 5%, transparent);
+  border-top: 1px solid var(--border);
   padding: 56px 0 32px;
 }
 
@@ -1455,7 +1440,7 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: var(--gradient-brand);
+  background: var(--gradient-primary);
   box-shadow: var(--shadow-glow);
   display: flex;
   align-items: center;
@@ -1494,7 +1479,7 @@
 
   &:hover {
     color: var(--foreground);
-    background: color-mix(in oklab, white 10%, transparent);
+    background: var(--accent);
   }
 }
 
@@ -1540,7 +1525,7 @@
   gap: 8px;
   text-align: center;
   padding-top: 24px;
-  border-top: 1px solid color-mix(in oklab, white 5%, transparent);
+  border-top: 1px solid var(--border);
   font-size: 0.78rem;
   color: var(--muted-foreground);
   opacity: 0.6;
@@ -1564,4 +1549,76 @@
 .landing {
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+// ─── Material Angular Overrides ───────────────────────────────────────────────
+// Override mat-accordion / mat-expansion-panel to match custom FAQ design
+
+::ng-deep {
+  // FAQ accordion overrides
+  .faq__accordion {
+    .mat-expansion-panel {
+      background: color-mix(in oklch, var(--card) 60%, transparent) !important;
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border) !important;
+      border-radius: 16px !important;
+      box-shadow: none !important;
+      color: var(--foreground) !important;
+      margin-bottom: 10px !important;
+
+      &:not([class*='mat-elevation-z']) {
+        box-shadow: none !important;
+      }
+    }
+
+    .mat-expansion-panel-header {
+      background: transparent !important;
+      color: var(--foreground) !important;
+      font-size: 0.95rem !important;
+      font-weight: 500 !important;
+      padding: 0 20px !important;
+      height: auto !important;
+      min-height: 60px !important;
+
+      &:hover {
+        background: var(--accent) !important;
+      }
+    }
+
+    .mat-expansion-panel-header-title,
+    .mat-panel-title {
+      color: var(--foreground) !important;
+      font-size: 0.95rem !important;
+      font-weight: 500 !important;
+    }
+
+    .mat-expansion-indicator::after {
+      color: var(--muted-foreground) !important;
+    }
+
+    .mat-expansion-panel-body {
+      color: var(--muted-foreground) !important;
+      font-size: 0.9rem !important;
+      line-height: 1.75 !important;
+      padding: 0 20px 20px !important;
+    }
+
+    .mat-expansion-panel-spacing {
+      margin: 0 !important;
+    }
+  }
+
+  // Stats mat-card overrides
+  .stats__grid {
+    .mat-mdc-card,
+    .mat-card {
+      background: color-mix(in oklch, var(--card) 60%, transparent) !important;
+      backdrop-filter: blur(14px) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 24px !important;
+      box-shadow: none !important;
+      color: var(--foreground) !important;
+      padding: 32px 24px !important;
+    }
+  }
 }

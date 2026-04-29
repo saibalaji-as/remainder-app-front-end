@@ -1,6 +1,12 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { ThemeService } from '../../../../core/services/theme.service';
+import { ThemeToggleComponent } from '../../../../shared/components/theme-toggle/theme-toggle.component';
 
 interface PhoneMsg {
   id: number;
@@ -23,11 +29,18 @@ const MSG_SEQ: PhoneMsg[] = [
   imports: [
     CommonModule,
     RouterModule,
+    ThemeToggleComponent,
+    MatExpansionModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
   ],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
+  private themeService = inject(ThemeService);
+
   navScrolled = false;
   menuOpen = false;
   currentYear = new Date().getFullYear();
@@ -181,7 +194,7 @@ export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('window:scroll')
   onScroll(): void {
-    this.navScrolled = window.scrollY > 8;
+    this.navScrolled = window.scrollY > 10;
   }
 
   toggleMenu(): void {

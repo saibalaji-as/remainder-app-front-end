@@ -1,14 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
-  imports: [CommonModule, MatProgressSpinnerModule],
+  imports: [CommonModule],
   template: `
     <div class="spinner-overlay" *ngIf="visible">
-      <mat-spinner [diameter]="diameter"></mat-spinner>
+      <div class="spinner" [style.width.px]="diameter" [style.height.px]="diameter"></div>
     </div>
   `,
   styles: [`
@@ -17,6 +16,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       justify-content: center;
       align-items: center;
       padding: 32px;
+    }
+
+    .spinner {
+      border: 3px solid #e9ecef;
+      border-top-color: #3f51b5;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   `]
 })

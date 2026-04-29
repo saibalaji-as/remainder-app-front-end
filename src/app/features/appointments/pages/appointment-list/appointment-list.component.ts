@@ -1,21 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatSelectModule } from '@angular/material/select';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { DialogService } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Appointment, AppointmentCreateDto, ReminderChannel } from '../../../../core/models/appointment.model';
 import { Contact } from '../../../../core/models/contact.model';
+import {
+  AppShellComponent,
+  PageHeaderComponent,
+  ChannelChipComponent,
+  StatusPillComponent,
+  SkeletonLoaderComponent,
+  EmptyStateComponent,
+} from '../../../../shared/components/index';
+
+type AppointmentTab = 'All' | 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
 
 @Component({
   selector: 'app-appointment-list',
@@ -23,16 +23,12 @@ import { Contact } from '../../../../core/models/contact.model';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatTableModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatSelectModule,
-    MatChipsModule,
-    MatDialogModule,
-    LoadingSpinnerComponent
+    AppShellComponent,
+    PageHeaderComponent,
+    ChannelChipComponent,
+    StatusPillComponent,
+    SkeletonLoaderComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './appointment-list.component.html',
   styleUrls: ['./appointment-list.component.scss']
@@ -40,9 +36,13 @@ import { Contact } from '../../../../core/models/contact.model';
 export class AppointmentListComponent implements OnInit {
   appointments: Appointment[] = [];
   contacts: Contact[] = [];
-  displayedColumns = ['title', 'contact', 'scheduledAt', 'reminderChannel', 'status', 'actions'];
   loading = false;
   showAddForm = false;
+
+  /** Active status tab — 'All' shows every appointment */
+  activeTab: AppointmentTab = 'All';
+
+  tabs: AppointmentTab[] = ['All', 'scheduled', 'confirmed', 'completed', 'cancelled'];
 
   reminderChannels: { value: ReminderChannel; label: string }[] = [
     { value: 'sms',   label: 'SMS' },
@@ -53,7 +53,7 @@ export class AppointmentListComponent implements OnInit {
   addForm = this.fb.group({
     contactId:       [null as number | null, Validators.required],
     title:           ['', Validators.required],
-    scheduledAt:     ['', Validators.required],   // datetime-local input → ISO string
+    scheduledAt:     ['', Validators.required],
     reminderChannel: ['sms' as ReminderChannel, Validators.required]
   });
 
@@ -61,7 +61,7 @@ export class AppointmentListComponent implements OnInit {
     private fb: FormBuilder,
     private api: ApiService,
     private toast: ToastService,
-    private dialog: MatDialog
+    private dialog: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -69,11 +69,42 @@ export class AppointmentListComponent implements OnInit {
     this.loadContacts();
   }
 
+  // ── Computed getters ──────────────────────────────────────────────────────
+
+  /** Appointments filtered by the active tab */
+  get filteredAppointments(): Appointment[] {
+    if (this.activeTab === 'All') return this.appointments;
+    return this.appointments.filter(a => a.status === this.activeTab);
+  }
+
+  /** Count of appointments matching a given status (used for tab badges) */
+  tabCount(status: AppointmentTab): number {
+    if (status === 'All') return this.appointments.length;
+    return this.appointments.filter(a => a.status === status).length;
+  }
+
+  // ── Display helpers ───────────────────────────────────────────────────────
+
+  /** Returns the first letter of a name, uppercased */
+  getInitial(name: string): string {
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
+
+  /** Formats an ISO date string to a human-readable date + time */
+  formatDateTime(iso: string): string {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      + ' · '
+      + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
+  // ── API calls ─────────────────────────────────────────────────────────────
+
   loadAppointments(): void {
     this.loading = true;
     this.api.get<Appointment[]>('/appointments').subscribe({
       next: (data) => {
-        // Sort by scheduledAt descending
         this.appointments = data.sort((a, b) =>
           new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
         );
@@ -125,8 +156,10 @@ export class AppointmentListComponent implements OnInit {
   }
 
   deleteAppointment(appointment: Appointment): void {
-    const ref = this.dialog.open(ConfirmDialogComponent, {
-      data: { title: 'Delete Appointment', message: `Delete "${appointment.title}"?`, confirmLabel: 'Delete' }
+    const ref = this.dialog.open({
+      title: 'Delete Appointment',
+      message: `Delete "${appointment.title}"?`,
+      confirmLabel: 'Delete'
     });
     ref.afterClosed().subscribe(confirmed => {
       if (confirmed) {

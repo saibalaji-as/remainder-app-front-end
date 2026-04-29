@@ -1,57 +1,227 @@
-<div class="page-container">
-  <h1>Dashboard</h1>
+<app-app-shell>
 
-  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
-
-  <div class="stats-grid" *ngIf="!loading && stats">
-    <mat-card>
-      <mat-card-content>
-        <div class="stat-row">
-          <mat-icon color="primary">event</mat-icon>
-          <div>
-            <div class="stat-value">{{ stats.totalAppointments }}</div>
-            <div class="stat-label">Total Appointments</div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-        <div class="stat-row">
-          <mat-icon color="accent">check_circle</mat-icon>
-          <div>
-            <div class="stat-value">{{ stats.completionRate }}%</div>
-            <div class="stat-label">Completion Rate</div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-        <div class="stat-row">
-          <mat-icon color="primary">today</mat-icon>
-          <div>
-            <div class="stat-value">{{ stats.scheduledToday }}</div>
-            <div class="stat-label">Scheduled Today</div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-content>
-        <div class="stat-row">
-          <mat-icon color="accent">done_all</mat-icon>
-          <div>
-            <div class="stat-value">{{ stats.completedAppointments }}</div>
-            <div class="stat-label">Completed</div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- ── Page header ──────────────────────────────────────────────────────── -->
+  <div class="dash-header">
+    <h1 class="dash-header__title">Dashboard</h1>
+    <p class="dash-header__sub">Welcome back. Here's what's happening across your appointments.</p>
   </div>
 
-  <p *ngIf="!loading && !stats" class="empty-state">No appointment data available.</p>
-</div>
+  <!-- ── Loading skeletons ─────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="dashboard-skeleton">
+      <div class="stats-grid">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton-card">
+            <app-skeleton-loader height="5rem" [rounded]="false"></app-skeleton-loader>
+          </div>
+        }
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <app-skeleton-loader height="16rem"></app-skeleton-loader>
+        </div>
+        <div class="chart-card">
+          <app-skeleton-loader height="16rem"></app-skeleton-loader>
+        </div>
+      </div>
+      <div class="lists-row">
+        <div class="list-card">
+          @for (i of [1,2,3,4,5]; track i) {
+            <app-skeleton-loader height="3.5rem" class="skeleton-row"></app-skeleton-loader>
+          }
+        </div>
+        <div class="list-card">
+          @for (i of [1,2,3,4,5]; track i) {
+            <app-skeleton-loader height="3.5rem" class="skeleton-row"></app-skeleton-loader>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── Error state ────────────────────────────────────────────────────────── -->
+  @if (!loading && error) {
+    <div class="error-banner">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>Failed to load dashboard data. Please try again.</span>
+    </div>
+  }
+
+  <!-- ── Main content ───────────────────────────────────────────────────────── -->
+  @if (!loading && !error && stats) {
+
+    <!-- Row 1: Stat cards -->
+    <div class="stats-grid">
+      <app-stat-card
+        label="Total Appointments"
+        [value]="stats.totalAppointments"
+        trend="+12% this week"
+        trendDirection="up"
+        icon="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+        accent="primary">
+      </app-stat-card>
+
+      <app-stat-card
+        label="Completion Rate"
+        [value]="stats.completionRate + '%'"
+        trend="+4 pts"
+        trendDirection="up"
+        icon="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3"
+        accent="success">
+      </app-stat-card>
+
+      <app-stat-card
+        label="Scheduled Today"
+        [value]="stats.scheduledToday"
+        trend="On track"
+        trendDirection="neutral"
+        icon="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2"
+        accent="info">
+      </app-stat-card>
+
+      <app-stat-card
+        label="Completed"
+        [value]="stats.completed"
+        trend="+3 last week"
+        trendDirection="up"
+        icon="M20 6 9 17l-5-5"
+        accent="warning">
+      </app-stat-card>
+    </div>
+
+    <!-- Row 2: Charts -->
+    <div class="charts-row">
+
+      <!-- Area chart -->
+      <div class="chart-card">
+        <div class="chart-card__header">
+          <div class="chart-card__header-left">
+            <h3 class="chart-card__title">Appointments over time</h3>
+            <p class="chart-card__sub">Last 7 days · scheduled to reminders sent</p>
+          </div>
+        </div>
+        <div class="chart-card__body">
+          <canvas baseChart
+            [data]="areaChartData"
+            [options]="areaChartOptions"
+            type="line">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Donut chart -->
+      <div class="chart-card chart-card--donut">
+        <div class="chart-card__header">
+          <div class="chart-card__header-left">
+            <h3 class="chart-card__title">Reminder channels</h3>
+            <p class="chart-card__sub">Distribution this period</p>
+          </div>
+        </div>
+        <div class="chart-card__body chart-card__body--donut">
+          <canvas baseChart
+            [data]="donutChartData"
+            [options]="donutChartOptions"
+            type="doughnut">
+          </canvas>
+        </div>
+        <!-- Custom legend -->
+        <div class="donut-legend">
+          @for (item of donutLegend; track item.label) {
+            <div class="donut-legend__item">
+              <span class="donut-legend__dot" [style.background]="item.color"></span>
+              <span class="donut-legend__label">{{ item.label }}</span>
+              <span class="donut-legend__count">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 3: Lists -->
+    <div class="lists-row">
+
+      <!-- Upcoming appointments -->
+      <div class="list-card">
+        <div class="list-card__header">
+          <h3 class="list-card__title">Upcoming appointments</h3>
+          <span class="list-card__count">{{ upcomingAppointments.length }} scheduled</span>
+        </div>
+
+        @if (upcomingAppointments.length === 0) {
+          <div class="list-card__empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                 style="color:var(--muted-foreground);opacity:0.4;margin-bottom:8px">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+              <line x1="16" x2="16" y1="2" y2="6"/>
+              <line x1="8" x2="8" y1="2" y2="6"/>
+              <line x1="3" x2="21" y1="10" y2="10"/>
+            </svg>
+            <p>No upcoming appointments.</p>
+          </div>
+        }
+
+        @for (appt of upcomingAppointments; track appt.id) {
+          <div class="list-item">
+            <div class="list-item__avatar">
+              {{ getInitial(appt.Contact?.name ?? appt.title) }}
+            </div>
+            <div class="list-item__info">
+              <span class="list-item__title">{{ appt.title }}</span>
+              <span class="list-item__sub">
+                {{ appt.Contact?.name ?? '—' }} · {{ formatDate(appt.scheduledAt) }}
+              </span>
+            </div>
+            <div class="list-item__meta">
+              <app-status-pill [status]="appt.status"></app-status-pill>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Recent reminder activity -->
+      <div class="list-card">
+        <div class="list-card__header">
+          <h3 class="list-card__title">Recent reminder activity</h3>
+          <span class="list-card__count">{{ recentReminders.length }} out of {{ reminders.length }}</span>
+        </div>
+
+        @if (recentReminders.length === 0) {
+          <div class="list-card__empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                 style="color:var(--muted-foreground);opacity:0.4;margin-bottom:8px">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+            </svg>
+            <p>No recent reminder activity.</p>
+          </div>
+        }
+
+        @for (reminder of recentReminders; track reminder.id) {
+          <div class="list-item">
+            <div class="list-item__channel">
+              <app-channel-chip [channel]="reminder.channel"></app-channel-chip>
+            </div>
+            <div class="list-item__info">
+              <span class="list-item__title">{{ getAppointmentTitle(reminder.appointmentId) }}</span>
+              <span class="list-item__sub">
+                {{ getContactName(reminder.appointmentId) }} · {{ formatRelativeTime(reminder.scheduledFor) }}
+              </span>
+            </div>
+            <div class="list-item__meta">
+              <app-status-pill [status]="reminder.status"></app-status-pill>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</app-app-shell>

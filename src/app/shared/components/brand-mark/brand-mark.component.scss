@@ -1,0 +1,24 @@
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem; // 10px ≈ gap-2.5
+
+  &__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    border-radius: 0.75rem; // rounded-xl
+    flex-shrink: 0;
+  }
+
+  &__bell {
+    color: var(--primary-foreground);
+  }
+
+  &__wordmark {
+    font-size: 1.125rem;   // text-lg
+    font-weight: 600;      // font-semibold
+    letter-spacing: -0.025em; // tracking-tight
+    white-space: nowrap;
+  }
+}

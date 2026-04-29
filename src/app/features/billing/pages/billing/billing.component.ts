@@ -1,16 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { StatusPillComponent } from '../../../../shared/components/status-pill/status-pill.component';
 import { Subscription, SubscribeDto } from '../../../../core/models/billing.model';
+
+interface Plan {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  features: string[];
+}
+
+interface Invoice {
+  id: string;
+  date: string;
+  amount: string;
+  status: string;
+}
 
 @Component({
   selector: 'app-billing',
@@ -18,13 +29,9 @@ import { Subscription, SubscribeDto } from '../../../../core/models/billing.mode
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    MatFormFieldModule,
-    MatInputModule,
-    LoadingSpinnerComponent
+    AppShellComponent,
+    PageHeaderComponent,
+    StatusPillComponent
   ],
   templateUrl: './billing.component.html',
   styleUrls: ['./billing.component.scss']
@@ -34,6 +41,20 @@ export class BillingComponent implements OnInit {
   loading = true;
   showSubscribeForm = false;
   cancelling = false;
+
+  activePlanId = 'pro';
+
+  plans: Plan[] = [
+    { id: 'starter', name: 'Starter', price: '$9', period: '/mo', features: ['Up to 100 reminders/mo', 'SMS + Email', 'CSV import', 'Email support'] },
+    { id: 'pro', name: 'Pro', price: '$29', period: '/mo', features: ['Up to 500 reminders/mo', 'SMS + Email', 'CSV import', 'Confirmation tracking', 'Priority support'] },
+    { id: 'business', name: 'Business', price: '$79', period: '/mo', features: ['Unlimited reminders', 'SMS + Email', 'CSV import', 'Confirmation tracking', 'Custom branding', 'Dedicated support'] },
+  ];
+
+  invoices: Invoice[] = [
+    { id: 'INV-001', date: '2024-01-01', amount: '$29.00', status: 'paid' },
+    { id: 'INV-002', date: '2024-02-01', amount: '$29.00', status: 'paid' },
+    { id: 'INV-003', date: '2024-03-01', amount: '$29.00', status: 'pending' },
+  ];
 
   subscribeForm = this.fb.group({
     priceId:         ['', Validators.required],

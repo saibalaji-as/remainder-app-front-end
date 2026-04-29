@@ -22,7 +22,8 @@
     "paths": {
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],
-      "@env/*": ["src/environments/*"]
+      "@env/*": ["src/environments/*"],
+      "chart.js/dist/types/utils": ["node_modules/chart.js/dist/types/utils.d.ts"]
     }
   },
   "angularCompilerOptions": {

@@ -1,0 +1,55 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  padding: 4rem 1.5rem; // py-16 px-6
+  border-radius: 1rem;  // rounded-2xl
+  border: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
+  background-color: color-mix(in srgb, var(--card) 40%, transparent);
+
+  &__icon-chip {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;  // w-14
+    height: 3.5rem; // h-14
+    border-radius: 1rem; // rounded-2xl
+    background: var(--gradient-soft);
+    flex-shrink: 0;
+  }
+
+  &__icon-svg {
+    width: 1.5rem;  // w-6
+    height: 1.5rem; // h-6
+    color: var(--primary);
+  }
+
+  &__title {
+    margin-top: 1rem; // mt-4
+    margin-bottom: 0;
+    font-size: 1rem;   // text-base
+    font-weight: 600;  // font-semibold
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+
+  &__description {
+    margin-top: 0.25rem; // mt-1
+    margin-bottom: 0;
+    max-width: 24rem;    // max-w-sm
+    font-size: 0.875rem; // text-sm
+    color: var(--muted-foreground);
+    line-height: 1.6;
+  }
+
+  &__action {
+    margin-top: 1.25rem; // mt-5
+
+    // Hide the wrapper when no action content is projected
+    &:empty {
+      display: none;
+    }
+  }
+}

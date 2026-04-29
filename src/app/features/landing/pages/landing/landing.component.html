@@ -5,9 +5,9 @@
     <div class="nav__container">
       <nav class="nav__bar" [class.nav__bar--scrolled]="navScrolled">
         <!-- Brand -->
-        <a class="nav__brand" routerLink="/">
+        <a class="nav__brand navbar__brand" routerLink="/">
           <span class="nav__logo-wrap">
-            <span class="material-icons" style="font-size:18px;color:#fff;">notifications_active</span>
+            <mat-icon style="font-size:18px;color:#fff;width:18px;height:18px;line-height:18px;">notifications_active</mat-icon>
           </span>
           <span class="nav__brand-name">Schedify</span>
         </a>
@@ -21,14 +21,15 @@
         </div>
 
         <!-- Desktop actions -->
-        <div class="nav__actions">
+        <div class="nav__actions navbar__actions">
+          <app-theme-toggle></app-theme-toggle>
           <a class="nav__login" routerLink="/auth/login">Login</a>
           <a class="nav__cta" routerLink="/auth/register">Get Started Free</a>
         </div>
 
         <!-- Hamburger -->
         <button class="nav__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
-          <span class="material-icons">{{ menuOpen ? 'close' : 'menu' }}</span>
+          <mat-icon>{{ menuOpen ? 'close' : 'menu' }}</mat-icon>
         </button>
       </nav>
 
@@ -38,6 +39,7 @@
         <a class="nav__mobile-link" (click)="scrollTo('how')">How it works</a>
         <a class="nav__mobile-link" (click)="scrollTo('pricing')">Pricing</a>
         <a class="nav__mobile-link" (click)="scrollTo('faq')">FAQ</a>
+        <app-theme-toggle></app-theme-toggle>
         <a class="nav__mobile-cta" routerLink="/auth/register" (click)="toggleMenu()">Get Started Free</a>
       </div>
     </div>
@@ -62,8 +64,8 @@
             Appointment reminders, on autopilot
           </span>
 
-          <h1 class="hero__h1">
-            Stop losing revenue to <span class="grad-text">no-shows.</span>
+          <h1 class="hero__h1 hero__headline">
+            Stop Losing Patients to <span class="grad-text">No-Shows.</span>
           </h1>
 
           <p class="hero__sub">
@@ -73,15 +75,15 @@
 
           <div class="hero__ctas">
             <a class="btn-gradient" routerLink="/auth/register">
-              Start free trial
-              <span class="material-icons btn-arrow">arrow_forward</span>
+              Start Free Trial
+              <mat-icon class="btn-arrow">arrow_forward</mat-icon>
             </a>
-            <button class="btn-glass" (click)="scrollTo('how')">See how it works</button>
+            <button class="btn-glass" mat-stroked-button (click)="scrollTo('how-it-works')">See how it works</button>
           </div>
 
           <div class="hero__stars">
             <span class="hero__stars-icons">
-              <span class="material-icons hero__star" *ngFor="let s of [1,2,3,4,5]">star</span>
+              <mat-icon class="hero__star" *ngFor="let s of [1,2,3,4,5]">star</mat-icon>
             </span>
             <span class="hero__stars-text">Loved by 2,000+ appointment-based businesses</span>
           </div>
@@ -104,7 +106,7 @@
                 <div *ngFor="let m of visibleMessages" class="msg msg--{{m.kind}}">
                   <div class="msg__header">
                     <span class="msg__badge">
-                      <span class="material-icons" style="font-size:12px;">{{ m.kind === 'sms' ? 'sms' : m.kind === 'email' ? 'email' : 'check_circle' }}</span>
+                      <mat-icon style="font-size:12px;width:12px;height:12px;line-height:12px;">{{ m.kind === 'sms' ? 'sms' : m.kind === 'email' ? 'email' : 'check_circle' }}</mat-icon>
                       {{ m.title }}
                     </span>
                     <span class="msg__time">{{ m.time }}</span>
@@ -131,19 +133,19 @@
   </section>
 
   <!-- ===== STATS ===== -->
-  <section class="stats">
+  <section class="stats problem">
     <div class="section-inner">
       <h2 class="section-title" style="text-align:center;margin-bottom:40px;">
-        No-shows are quietly <span class="grad-text">killing your revenue</span>
+        No-shows are killing your revenue
       </h2>
       <div class="stats__grid">
-        <div *ngFor="let s of stats; let i = index"
+        <mat-card *ngFor="let s of stats; let i = index"
              class="stat-card reveal"
              [attr.data-delay]="i * 100">
           <div class="stat-card__glow"></div>
           <div class="stat-card__value grad-text">{{ s.value }}</div>
           <p class="stat-card__label">{{ s.label }}</p>
-        </div>
+        </mat-card>
       </div>
       <p class="stats__sub">
         Manual calls eat your team's time. Relying on customers to remember doesn't work.
@@ -169,7 +171,7 @@
              class="feat-card feat-card--{{f.tint}} reveal"
              [attr.data-delay]="i * 80">
           <div class="feat-card__icon-wrap">
-            <span class="material-icons">{{ f.icon }}</span>
+            <mat-icon>{{ f.icon }}</mat-icon>
           </div>
           <h3 class="feat-card__title">{{ f.title }}</h3>
           <p class="feat-card__desc">{{ f.desc }}</p>
@@ -179,7 +181,7 @@
   </section>
 
   <!-- ===== HOW IT WORKS ===== -->
-  <section class="how" id="how">
+  <section class="how" id="how-it-works">
     <div class="section-inner">
       <div class="section-header section-header--center reveal">
         <span class="eyebrow">How it works</span>
@@ -193,7 +195,7 @@
              class="step-card reveal"
              [attr.data-delay]="i * 100">
           <div class="step-card__icon-wrap">
-            <span class="material-icons">{{ s.icon }}</span>
+            <mat-icon>{{ s.icon }}</mat-icon>
           </div>
           <div class="step-card__num">0{{ i + 1 }}</div>
           <h3 class="step-card__title">{{ s.title }}</h3>
@@ -229,7 +231,7 @@
           </div>
           <ul class="plan-card__perks">
             <li *ngFor="let perk of p.perks" class="plan-card__perk">
-              <span class="perk-check"><span class="material-icons" style="font-size:12px;color:#fff;">check</span></span>
+              <span class="perk-check"><mat-icon style="font-size:12px;width:12px;height:12px;line-height:12px;color:#fff;">check</mat-icon></span>
               {{ perk }}
             </li>
           </ul>
@@ -258,7 +260,7 @@
                 class="testi-card reveal"
                 [attr.data-delay]="i * 100">
           <div class="testi-card__stars">
-            <span class="material-icons testi-card__star" *ngFor="let s of [1,2,3,4,5]">star</span>
+            <mat-icon class="testi-card__star" *ngFor="let s of [1,2,3,4,5]">star</mat-icon>
           </div>
           <blockquote class="testi-card__quote">"{{ t.quote }}"</blockquote>
           <figcaption class="testi-card__author">
@@ -282,37 +284,34 @@
           Questions, <span class="grad-text">answered.</span>
         </h2>
       </div>
-      <div class="faq__accordion">
-        <div *ngFor="let f of faqs; let i = index"
-             class="faq-item"
-             [class.faq-item--open]="openFaq === i">
-          <button class="faq-item__q" (click)="toggleFaq(i)">
-            {{ f.q }}
-            <span class="material-icons faq-chevron">expand_more</span>
-          </button>
+      <mat-accordion class="faq__accordion">
+        <mat-expansion-panel *ngFor="let f of faqs; let i = index" class="faq-item">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="faq-item__q">{{ f.q }}</mat-panel-title>
+          </mat-expansion-panel-header>
           <div class="faq-item__a">
             <p>{{ f.a }}</p>
           </div>
-        </div>
-      </div>
+        </mat-expansion-panel>
+      </mat-accordion>
     </div>
   </section>
 
   <!-- ===== FINAL CTA ===== -->
-  <section class="cta-section" id="cta">
+  <section class="cta-section final-cta" id="cta">
     <div class="section-inner">
       <div class="cta-box reveal">
         <div class="cta-box__bg"></div>
         <div class="cta-box__overlay"></div>
         <div class="cta-box__grid"></div>
         <div class="cta-box__content">
-          <h2 class="cta-box__h2">Ready to end no-shows?</h2>
+          <h2 class="cta-box__h2 final-cta__headline">Ready to eliminate no-shows?</h2>
           <p class="cta-box__sub">
             Join hundreds of businesses already saving time and revenue with Schedify.
           </p>
           <a class="cta-box__btn" routerLink="/auth/register">
             Start Free Today
-            <span class="material-icons btn-arrow">arrow_forward</span>
+            <mat-icon class="btn-arrow">arrow_forward</mat-icon>
           </a>
           <p class="cta-box__note">No credit card required · Setup in under 10 minutes</p>
         </div>
@@ -328,20 +327,20 @@
         <div class="footer__brand-col">
           <a class="footer__brand" routerLink="/">
             <span class="footer__logo-wrap">
-              <span class="material-icons" style="font-size:16px;color:#fff;">notifications_active</span>
+              <mat-icon style="font-size:16px;color:#fff;width:16px;height:16px;line-height:16px;">notifications_active</mat-icon>
             </span>
             <span class="footer__brand-name">Schedify</span>
           </a>
           <p class="footer__tagline">Automated reminders. Fewer no-shows. More revenue.</p>
           <div class="footer__socials">
             <a class="footer__social" href="#" aria-label="Twitter">
-              <span class="material-icons" style="font-size:18px;">alternate_email</span>
+              <mat-icon style="font-size:18px;">alternate_email</mat-icon>
             </a>
             <a class="footer__social" href="#" aria-label="GitHub">
-              <span class="material-icons" style="font-size:18px;">code</span>
+              <mat-icon style="font-size:18px;">code</mat-icon>
             </a>
             <a class="footer__social" href="#" aria-label="LinkedIn">
-              <span class="material-icons" style="font-size:18px;">work</span>
+              <mat-icon style="font-size:18px;">work</mat-icon>
             </a>
           </div>
         </div>

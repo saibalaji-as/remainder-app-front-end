@@ -1,113 +1,262 @@
-<div class="page-container">
-  <div class="flex-row">
-    <h1>Contacts</h1>
-    <span class="spacer"></span>
-    <button mat-flat-button color="primary" (click)="showAddForm = !showAddForm">
-      <mat-icon>add</mat-icon> Add Contact
-    </button>
-    <label>
-      <button mat-stroked-button type="button" onclick="this.nextElementSibling.click()">
-        <mat-icon>upload_file</mat-icon> Import CSV
+<app-app-shell>
+
+  <!-- ── Page header ──────────────────────────────────────────────────────── -->
+  <app-page-header title="Contacts">
+    <ng-container actions>
+      <button class="btn-gradient-pill" (click)="showAddForm = !showAddForm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Contact
       </button>
-      <input type="file" accept=".csv" hidden (change)="onCsvFileSelected($event)">
-    </label>
+      <label class="btn-ghost" style="cursor:pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Import CSV
+        <input type="file" accept=".csv" hidden (change)="onCsvFileSelected($event)">
+      </label>
+    </ng-container>
+  </app-page-header>
+
+  <!-- ── Add Contact Form ─────────────────────────────────────────────────── -->
+  @if (showAddForm) {
+    <div class="form-card">
+      <div class="form-card__header">
+        <h2 class="form-card__title">New Contact</h2>
+      </div>
+      <div class="form-card__body">
+        <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" formControlName="name" placeholder="John Doe">
+            @if (addForm.get('name')?.hasError('required') && addForm.get('name')?.touched) {
+              <span class="form-error">Required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" formControlName="email" placeholder="john@example.com">
+            @if (addForm.get('email')?.hasError('required') && addForm.get('email')?.touched) {
+              <span class="form-error">Required</span>
+            }
+            @if (addForm.get('email')?.hasError('email') && addForm.get('email')?.touched) {
+              <span class="form-error">Invalid email</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" formControlName="phone" placeholder="+1 555 000 0000">
+            @if (addForm.get('phone')?.hasError('required') && addForm.get('phone')?.touched) {
+              <span class="form-error">Required</span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-gradient-pill" type="submit">Save</button>
+            <button class="btn-ghost" type="button" (click)="showAddForm = false">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── CSV Preview ──────────────────────────────────────────────────────── -->
+  @if (csvPreviewRows.length > 0) {
+    <div class="form-card">
+      <div class="form-card__header">
+        <h2 class="form-card__title">CSV Preview (first 5 rows)</h2>
+      </div>
+      <div class="form-card__body">
+        <div class="table-scroll">
+          <table class="csv-table">
+            <thead>
+              <tr>
+                @for (h of csvHeaders; track h) {
+                  <th>{{ h }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of csvPreviewRows; track $index) {
+                <tr>
+                  @for (cell of row; track $index) {
+                    <td>{{ cell }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-card__footer">
+        <button class="btn-gradient-pill" (click)="confirmCsvImport()">Confirm Import</button>
+        <button class="btn-ghost" (click)="csvPreviewRows = []">Cancel</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Search bar ───────────────────────────────────────────────────────── -->
+  <div class="search-bar">
+    <div class="search-bar__input-wrap">
+      <svg class="search-bar__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input class="search-bar__input" type="text"
+             placeholder="Search contacts…"
+             [formControl]="searchControl">
+    </div>
+    @if (searchControl.value) {
+      <span class="search-bar__count">
+        {{ filteredContacts.length }} of {{ contacts.length }} contacts
+      </span>
+    } @else {
+      <span class="search-bar__count">{{ contacts.length }} contacts</span>
+    }
   </div>
 
-  <!-- Add Contact Form -->
-  <mat-card *ngIf="showAddForm" class="add-form-card">
-    <mat-card-header><mat-card-title>New Contact</mat-card-title></mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="addForm" (ngSubmit)="submitAdd()" class="form-grid">
-        <mat-form-field>
-          <mat-label>Full Name</mat-label>
-          <input matInput formControlName="name">
-          <mat-error *ngIf="addForm.get('name')?.hasError('required')">Required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email">
-          <mat-error *ngIf="addForm.get('email')?.hasError('required')">Required</mat-error>
-          <mat-error *ngIf="addForm.get('email')?.hasError('email')">Invalid email</mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Phone</mat-label>
-          <input matInput formControlName="phone">
-          <mat-error *ngIf="addForm.get('phone')?.hasError('required')">Required</mat-error>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button mat-flat-button color="primary" type="submit">Save</button>
-          <button mat-button type="button" (click)="showAddForm = false">Cancel</button>
+  <!-- ── Loading skeletons ─────────────────────────────────────────────────── -->
+  @if (loading) {
+    <div class="skeleton-table">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="skeleton-row">
+          <app-skeleton-loader [rounded]="true" width="2.25rem" height="2.25rem"></app-skeleton-loader>
+          <app-skeleton-loader width="40%" height="1rem"></app-skeleton-loader>
+          <app-skeleton-loader width="30%" height="1rem"></app-skeleton-loader>
+          <app-skeleton-loader width="20%" height="1rem"></app-skeleton-loader>
         </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
+      }
+    </div>
+  }
 
-  <!-- CSV Preview -->
-  <mat-card *ngIf="csvPreviewRows.length > 0" class="csv-preview-card">
-    <mat-card-header><mat-card-title>CSV Preview (first 5 rows)</mat-card-title></mat-card-header>
-    <mat-card-content>
-      <table class="csv-table">
+  <!-- ── Empty state ───────────────────────────────────────────────────────── -->
+  @if (!loading && filteredContacts.length === 0) {
+    <app-empty-state
+      title="No contacts found"
+      [description]="searchControl.value ? 'Try a different search term.' : 'Add your first contact to get started.'"
+      icon="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z">
+      <ng-container action>
+        @if (!searchControl.value) {
+          <button class="btn-gradient-pill" (click)="showAddForm = true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Contact
+          </button>
+        }
+      </ng-container>
+    </app-empty-state>
+  }
+
+  <!-- ── Desktop table (≥768px) ────────────────────────────────────────────── -->
+  @if (!loading && filteredContacts.length > 0) {
+    <div class="contacts-table-wrap">
+      <table class="contacts-table">
         <thead>
-          <tr><th *ngFor="let h of csvHeaders">{{ h }}</th></tr>
+          <tr>
+            <th class="col-name">Name</th>
+            <th class="col-email">Email</th>
+            <th class="col-phone">Phone</th>
+            <th class="col-tag">Tag</th>
+            <th class="col-actions"></th>
+          </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of csvPreviewRows">
-            <td *ngFor="let cell of row">{{ cell }}</td>
-          </tr>
+          @for (c of pagedContacts; track c.id) {
+            <tr class="contacts-table__row">
+              <td class="col-name">
+                <div class="contact-name-cell">
+                  <div class="contact-avatar" aria-hidden="true">
+                    {{ getInitial(c.name) }}
+                  </div>
+                  <span class="contact-name">{{ c.name }}</span>
+                </div>
+              </td>
+              <td class="col-email contact-meta">{{ c.email }}</td>
+              <td class="col-phone contact-meta">{{ c.phone }}</td>
+              <td class="col-tag">
+                <app-status-pill [status]="getInitial(c.name)"></app-status-pill>
+              </td>
+              <td class="col-actions">
+                <button class="btn-icon-danger" (click)="deleteContact(c)" aria-label="Delete contact">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/><path d="M14 11v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-flat-button color="primary" (click)="confirmCsvImport()">Confirm Import</button>
-      <button mat-button (click)="csvPreviewRows = []">Cancel</button>
-    </mat-card-actions>
-  </mat-card>
+    </div>
 
-  <!-- Search -->
-  <mat-form-field class="search-field">
-    <mat-label>Search contacts</mat-label>
-    <input matInput [formControl]="searchControl">
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+    <!-- ── Mobile cards (<768px) ─────────────────────────────────────────── -->
+    <div class="mobile-cards">
+      @for (c of pagedContacts; track c.id) {
+        <div class="mobile-card">
+          <div class="mobile-card__header">
+            <div class="contact-avatar" aria-hidden="true">{{ getInitial(c.name) }}</div>
+            <div class="mobile-card__info">
+              <span class="mobile-card__name">{{ c.name }}</span>
+              <span class="mobile-card__email">{{ c.email }}</span>
+            </div>
+            <button class="btn-icon-danger" (click)="deleteContact(c)" aria-label="Delete contact">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+          <div class="mobile-card__phone">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.29 6.29l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            {{ c.phone }}
+          </div>
+        </div>
+      }
+    </div>
 
-  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
-
-  <mat-table [dataSource]="pagedContacts" *ngIf="!loading">
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-      <mat-cell *matCellDef="let c">{{ c.name }}</mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="email">
-      <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
-      <mat-cell *matCellDef="let c">{{ c.email }}</mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="phone">
-      <mat-header-cell *matHeaderCellDef>Phone</mat-header-cell>
-      <mat-cell *matCellDef="let c">{{ c.phone }}</mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef></mat-header-cell>
-      <mat-cell *matCellDef="let c">
-        <button mat-icon-button color="warn" (click)="deleteContact(c)" aria-label="Delete contact">
-          <mat-icon>delete</mat-icon>
+    <!-- ── Pagination ─────────────────────────────────────────────────────── -->
+    @if (filteredContacts.length > pageSize) {
+      <div class="pagination">
+        <button class="btn-ghost btn-sm" [disabled]="pageIndex === 0" (click)="prevPage()">
+          Previous
         </button>
-      </mat-cell>
-    </ng-container>
+        <span class="pagination__info">
+          {{ pageIndex * pageSize + 1 }}–{{ min((pageIndex + 1) * pageSize, filteredContacts.length) }}
+          of {{ filteredContacts.length }}
+        </span>
+        <button class="btn-ghost btn-sm"
+                [disabled]="(pageIndex + 1) * pageSize >= filteredContacts.length"
+                (click)="nextPage()">
+          Next
+        </button>
+      </div>
+    }
+  }
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
-
-  <mat-paginator
-    [length]="filteredContacts.length"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, 25]"
-    (page)="onPage($event)">
-  </mat-paginator>
-</div>
+</app-app-shell>

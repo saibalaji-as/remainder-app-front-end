@@ -1,12 +1,21 @@
 // Feature: schedify-landing-redesign, Property 2: FAQ accordion mutual exclusion
 // Validates: Requirements 12.4
 import * as fc from 'fast-check';
+import { TestBed } from '@angular/core/testing';
 import { LandingComponent } from './landing.component';
+import { provideRouter } from '@angular/router';
 
 describe('LandingComponent – FAQ accordion (Property 2: mutual exclusion)', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LandingComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
+  });
+
   function makeComponent(): LandingComponent {
-    // LandingComponent has no injected dependencies — safe to instantiate directly
-    return new LandingComponent();
+    const fixture = TestBed.createComponent(LandingComponent);
+    return fixture.componentInstance;
   }
 
   it('openFaq is always null or a single valid index after any sequence of toggles', () => {
