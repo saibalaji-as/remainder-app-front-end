@@ -5,7 +5,6 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { provideServiceWorker } from '@angular/service-worker';
 import { APP_ROUTES } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
-import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
     provideCharts(withDefaultRegisterables()),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: environment.production,
+      enabled: true,
       registrationStrategy: 'registerWhenStable:30000'
     })
   ]
