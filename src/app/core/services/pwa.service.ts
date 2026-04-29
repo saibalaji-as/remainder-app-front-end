@@ -31,6 +31,14 @@ export class PwaService {
 
     // Capture install prompt and track installed state (browser only)
     if (isPlatformBrowser(this.platformId)) {
+      // If beforeinstallprompt already fired before Angular bootstrapped,
+      // main.ts stashed it on window — pick it up immediately.
+      if ((window as any).__deferredInstallPrompt) {
+        this._deferredPrompt = (window as any).__deferredInstallPrompt;
+        delete (window as any).__deferredInstallPrompt;
+        this._installAvailable$.next(true);
+      }
+
       window.addEventListener('beforeinstallprompt', (event: Event) => {
         event.preventDefault();
         this._deferredPrompt = event;
