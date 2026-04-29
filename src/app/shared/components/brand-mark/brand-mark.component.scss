@@ -1,24 +1,34 @@
 .brand-mark {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.625rem; // 10px ≈ gap-2.5
+  gap: 0.5rem;
+  flex-shrink: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 
-  &__icon {
-    position: relative;
-    display: grid;
-    place-items: center;
-    border-radius: 0.75rem; // rounded-xl
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &__logo {
+    display: block;
+    width: auto;
+    object-fit: contain;
     flex-shrink: 0;
   }
 
-  &__bell {
-    color: var(--primary-foreground);
-  }
-
   &__wordmark {
-    font-size: 1.125rem;   // text-lg
-    font-weight: 600;      // font-semibold
-    letter-spacing: -0.025em; // tracking-tight
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     white-space: nowrap;
+    line-height: 1;
+
+    // Pink → purple gradient matching the logo image
+    background: linear-gradient(90deg, #e8197d 0%, #8b2fc9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }

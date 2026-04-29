@@ -231,12 +231,31 @@
 .nav__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   color: var(--foreground);
   font-weight: 700;
   font-size: 1rem;
   flex-shrink: 0;
+}
+
+.nav__logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.nav__brand-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  line-height: 1;
+  background: linear-gradient(90deg, #e8197d 0%, #8b2fc9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .nav__logo-wrap {
@@ -249,12 +268,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.nav__brand-name {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--foreground);
 }
 
 .nav__links {
@@ -335,12 +348,23 @@
   color: var(--foreground);
   cursor: pointer;
   border-radius: 8px;
-  margin-left: auto;
   transition: background 0.15s ease;
 
   &:hover {
     background: var(--accent);
   }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+// Mobile-only group: theme toggle + hamburger, always visible on small screens
+.nav__mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
 
   @media (min-width: 768px) {
     display: none;
@@ -569,7 +593,7 @@
 }
 
 .phone__screen {
-  background: var(--sidebar);
+  background: #0f0d1a;
   aspect-ratio: 9 / 19;
   border-radius: 2rem;
   overflow: hidden;
@@ -583,7 +607,7 @@
   width: 112px;
   height: 24px;
   border-radius: 999px;
-  background: color-mix(in oklch, var(--sidebar) 70%, transparent);
+  background: rgba(0, 0, 0, 0.6);
   margin: 0 auto 4px;
   flex-shrink: 0;
 }
@@ -598,8 +622,7 @@
 
 .phone__time {
   font-size: 10px;
-  color: var(--sidebar-foreground);
-  opacity: 0.6;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
 }
 
@@ -608,8 +631,7 @@
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  color: var(--sidebar-foreground);
-  opacity: 0.6;
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 600;
 }
 
@@ -631,7 +653,7 @@
 
 .phone__fade {
   height: 80px;
-  background: linear-gradient(to top, var(--sidebar), transparent);
+  background: linear-gradient(to top, #0f0d1a, transparent);
   margin-top: -80px;
   flex-shrink: 0;
   pointer-events: none;
@@ -695,14 +717,12 @@
 
 .msg__time {
   font-size: 9px;
-  color: var(--sidebar-foreground);
-  opacity: 0.4;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .msg__body {
   font-size: 10px;
-  color: var(--sidebar-foreground);
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.5;
   margin: 0;
 }
@@ -1429,11 +1449,30 @@
 .footer__brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   color: var(--foreground);
   font-weight: 700;
   font-size: 1rem;
+}
+
+.footer__logo-img {
+  height: 28px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.footer__brand-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  line-height: 1;
+  background: linear-gradient(90deg, #e8197d 0%, #8b2fc9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .footer__logo-wrap {

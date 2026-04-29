@@ -6,9 +6,7 @@
       <nav class="nav__bar" [class.nav__bar--scrolled]="navScrolled">
         <!-- Brand -->
         <a class="nav__brand navbar__brand" routerLink="/">
-          <span class="nav__logo-wrap">
-            <mat-icon style="font-size:18px;color:#fff;width:18px;height:18px;line-height:18px;">notifications_active</mat-icon>
-          </span>
+          <img src="assets/logo/schedify-logo.png" alt="" class="nav__logo-img" />
           <span class="nav__brand-name">Schedify</span>
         </a>
 
@@ -27,10 +25,13 @@
           <a class="nav__cta" routerLink="/auth/register">Get Started Free</a>
         </div>
 
-        <!-- Hamburger -->
-        <button class="nav__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
-          <mat-icon>{{ menuOpen ? 'close' : 'menu' }}</mat-icon>
-        </button>
+        <!-- Mobile: theme toggle always visible + hamburger -->
+        <div class="nav__mobile-actions">
+          <app-theme-toggle></app-theme-toggle>
+          <button class="nav__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Toggle menu">
+            <mat-icon>{{ menuOpen ? 'close' : 'menu' }}</mat-icon>
+          </button>
+        </div>
       </nav>
 
       <!-- Mobile drawer -->
@@ -39,7 +40,6 @@
         <a class="nav__mobile-link" (click)="scrollTo('how')">How it works</a>
         <a class="nav__mobile-link" (click)="scrollTo('pricing')">Pricing</a>
         <a class="nav__mobile-link" (click)="scrollTo('faq')">FAQ</a>
-        <app-theme-toggle></app-theme-toggle>
         <a class="nav__mobile-cta" routerLink="/auth/register" (click)="toggleMenu()">Get Started Free</a>
       </div>
     </div>
@@ -326,9 +326,7 @@
         <!-- Brand column -->
         <div class="footer__brand-col">
           <a class="footer__brand" routerLink="/">
-            <span class="footer__logo-wrap">
-              <mat-icon style="font-size:16px;color:#fff;width:16px;height:16px;line-height:16px;">notifications_active</mat-icon>
-            </span>
+            <img src="assets/logo/schedify-logo.png" alt="" class="footer__logo-img" />
             <span class="footer__brand-name">Schedify</span>
           </a>
           <p class="footer__tagline">Automated reminders. Fewer no-shows. More revenue.</p>
