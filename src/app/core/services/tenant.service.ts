@@ -16,7 +16,8 @@ export class TenantService {
   }
 
   get tenantId(): string {
-    return this._tenant$.getValue()?.id ?? '';
+    const id = this._tenant$.getValue()?.id;
+    return id !== undefined ? String(id) : '';
   }
 
   loadTenant(): Observable<Tenant> {

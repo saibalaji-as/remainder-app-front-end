@@ -1,5 +1,52 @@
-export interface DashboardStats {
+export interface TrendObject {
+  value: number | null;
+  direction: 'up' | 'down' | 'neutral';
+}
+
+export interface DashboardStatsBlock {
+  totalContacts: number;
   totalAppointments: number;
-  confirmationRate: number;   // percentage 0-100
-  noShowsToday: number;
+  totalRemindersSent: number;
+  totalRemindersFailed: number;
+  deliveryRate: number;
+  trends: {
+    totalAppointments: TrendObject;
+    totalRemindersSent: TrendObject;
+    deliveryRate: TrendObject;
+  };
+}
+
+export interface GraphDataEntry {
+  day: string;
+  date: string;
+  appts: number;
+  reminders: number;
+}
+
+export interface UpcomingAppointment {
+  id: string;
+  title: string;
+  scheduled_at: string;
+  contact: {
+    name: string;
+    phone: string;
+  };
+}
+
+export interface RecentReminder {
+  id: string;
+  status: string;
+  sent_at: string;
+  appointment_id: string;
+}
+
+export interface DashboardStatsResponse {
+  stats: DashboardStatsBlock;
+  graphData: GraphDataEntry[];
+  pieData: {
+    sms: number;
+    email: number;
+  };
+  upcomingAppointments: UpcomingAppointment[];
+  recentReminders: RecentReminder[];
 }

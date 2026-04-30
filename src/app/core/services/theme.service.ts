@@ -20,9 +20,11 @@ export class ThemeService {
 
   toggle(): void {
     const next = this.themeSubject.value === 'dark' ? 'light' : 'dark';
-    this.themeSubject.next(next);
+    // Apply the DOM class FIRST so that any subscriber reading
+    // document.documentElement.classList sees the updated state.
     this.applyClass(next);
     localStorage.setItem(this.STORAGE_KEY, next);
+    this.themeSubject.next(next);
   }
 
   private applyClass(theme: 'dark' | 'light'): void {

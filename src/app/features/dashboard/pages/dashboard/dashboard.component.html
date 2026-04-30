@@ -52,43 +52,43 @@
   }
 
   <!-- ── Main content ───────────────────────────────────────────────────────── -->
-  @if (!loading && !error && stats) {
+  @if (!loading && !error && statsResponse) {
 
     <!-- Row 1: Stat cards -->
     <div class="stats-grid">
       <app-stat-card
-        label="Total Appointments"
-        [value]="stats.totalAppointments"
-        trend="+12% this week"
-        trendDirection="up"
-        icon="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+        label="Total Contacts"
+        [value]="statsResponse!.stats.totalContacts"
+        [trend]="formatTrendLabel(null)"
+        trendDirection="neutral"
+        icon="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
         accent="primary">
       </app-stat-card>
 
       <app-stat-card
-        label="Completion Rate"
-        [value]="stats.completionRate + '%'"
-        trend="+4 pts"
-        trendDirection="up"
-        icon="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3"
+        label="Total Appointments"
+        [value]="statsResponse!.stats.totalAppointments"
+        [trend]="formatTrendLabel(statsResponse!.stats.trends.totalAppointments.value)"
+        [trendDirection]="statsResponse!.stats.trends.totalAppointments.direction"
+        icon="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
         accent="success">
       </app-stat-card>
 
       <app-stat-card
-        label="Scheduled Today"
-        [value]="stats.scheduledToday"
-        trend="On track"
-        trendDirection="neutral"
-        icon="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2"
+        label="Reminders Sent"
+        [value]="statsResponse!.stats.totalRemindersSent"
+        [trend]="formatTrendLabel(statsResponse!.stats.trends.totalRemindersSent.value)"
+        [trendDirection]="statsResponse!.stats.trends.totalRemindersSent.direction"
+        icon="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"
         accent="info">
       </app-stat-card>
 
       <app-stat-card
-        label="Completed"
-        [value]="stats.completed"
-        trend="+3 last week"
-        trendDirection="up"
-        icon="M20 6 9 17l-5-5"
+        label="Delivery Rate"
+        [value]="statsResponse!.stats.deliveryRate + '%'"
+        [trend]="formatTrendLabel(statsResponse!.stats.trends.deliveryRate.value)"
+        [trendDirection]="statsResponse!.stats.trends.deliveryRate.direction"
+        icon="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3"
         accent="warning">
       </app-stat-card>
     </div>
@@ -149,10 +149,10 @@
       <div class="list-card">
         <div class="list-card__header">
           <h3 class="list-card__title">Upcoming appointments</h3>
-          <span class="list-card__count">{{ upcomingAppointments.length }} scheduled</span>
+          <span class="list-card__count">{{ statsResponse!.upcomingAppointments.length }} scheduled</span>
         </div>
 
-        @if (upcomingAppointments.length === 0) {
+        @if (statsResponse!.upcomingAppointments.length === 0) {
           <div class="list-card__empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
@@ -166,19 +166,16 @@
           </div>
         }
 
-        @for (appt of upcomingAppointments; track appt.id) {
+        @for (appt of statsResponse!.upcomingAppointments; track appt.id) {
           <div class="list-item">
             <div class="list-item__avatar">
-              {{ getInitial(appt.Contact?.name ?? appt.title) }}
+              {{ getInitial(appt.contact.name) }}
             </div>
             <div class="list-item__info">
               <span class="list-item__title">{{ appt.title }}</span>
               <span class="list-item__sub">
-                {{ appt.Contact?.name ?? '—' }} · {{ formatDate(appt.scheduledAt) }}
+                {{ appt.contact.name }} · {{ formatDate(appt.scheduled_at) }}
               </span>
-            </div>
-            <div class="list-item__meta">
-              <app-status-pill [status]="appt.status"></app-status-pill>
             </div>
           </div>
         }
@@ -188,10 +185,10 @@
       <div class="list-card">
         <div class="list-card__header">
           <h3 class="list-card__title">Recent reminder activity</h3>
-          <span class="list-card__count">{{ recentReminders.length }} out of {{ reminders.length }}</span>
+          <span class="list-card__count">{{ statsResponse!.recentReminders.length }} recent</span>
         </div>
 
-        @if (recentReminders.length === 0) {
+        @if (statsResponse!.recentReminders.length === 0) {
           <div class="list-card__empty">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
@@ -203,15 +200,12 @@
           </div>
         }
 
-        @for (reminder of recentReminders; track reminder.id) {
+        @for (reminder of statsResponse!.recentReminders; track reminder.id) {
           <div class="list-item">
-            <div class="list-item__channel">
-              <app-channel-chip [channel]="reminder.channel"></app-channel-chip>
-            </div>
             <div class="list-item__info">
-              <span class="list-item__title">{{ getAppointmentTitle(reminder.appointmentId) }}</span>
+              <span class="list-item__title">{{ reminder.appointment_id }}</span>
               <span class="list-item__sub">
-                {{ getContactName(reminder.appointmentId) }} · {{ formatRelativeTime(reminder.scheduledFor) }}
+                {{ formatRelativeTime(reminder.sent_at) }}
               </span>
             </div>
             <div class="list-item__meta">
