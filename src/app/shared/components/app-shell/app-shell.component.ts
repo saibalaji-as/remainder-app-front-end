@@ -12,7 +12,7 @@ import { IosInstallComponent } from '../ios-install/ios-install.component';
 interface NavItem {
   path: string;
   label: string;
-  icon: 'dashboard' | 'contacts' | 'appointments' | 'reminders' | 'billing';
+  icon: 'dashboard' | 'contacts' | 'appointments' | 'reminders' | 'billing' | 'settings';
 }
 
 @Component({
@@ -29,11 +29,12 @@ export class AppShellComponent {
   drawerOpen = false;
 
   navItems: NavItem[] = [
-    { path: '/dashboard',    label: 'Dashboard',    icon: 'dashboard'    },
-    { path: '/contacts',     label: 'Contacts',     icon: 'contacts'     },
-    { path: '/appointments', label: 'Appointments', icon: 'appointments' },
-    { path: '/reminders',    label: 'Reminders',    icon: 'reminders'    },
-    { path: '/billing',      label: 'Billing',      icon: 'billing'      },
+    { path: '/dashboard',                label: 'Dashboard',       icon: 'dashboard'    },
+    { path: '/contacts',                 label: 'Contacts',        icon: 'contacts'     },
+    { path: '/appointments',             label: 'Appointments',    icon: 'appointments' },
+    { path: '/reminders',                label: 'Reminders',       icon: 'reminders'    },
+    { path: '/billing',                  label: 'Billing',         icon: 'billing'      },
+    { path: '/settings/email-template',  label: 'Email Template',  icon: 'settings'     },
   ];
 
   openDrawer(): void {

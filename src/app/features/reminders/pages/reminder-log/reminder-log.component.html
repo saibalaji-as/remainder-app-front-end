@@ -1,19 +1,44 @@
 <app-app-shell>
 
   <!-- ── Page header ──────────────────────────────────────────────────────── -->
-  <app-page-header title="Reminders"></app-page-header>
+  <app-page-header title="Reminders">
+    <!-- SSE connection-status indicator -->
+    <div class="sse-indicator" [class.sse-indicator--connected]="sseConnected" [title]="sseConnected ? 'Live updates active' : 'Connecting…'">
+      <span class="sse-indicator__dot"></span>
+      <span class="sse-indicator__label">{{ sseConnected ? 'Live' : 'Connecting' }}</span>
+    </div>
+  </app-page-header>
 
-  <!-- ── Filter chips ─────────────────────────────────────────────────────── -->
-  <div class="filter-chips">
-    @for (f of filters; track f) {
-      <button
-        class="filter-chip"
-        [class.filter-chip--active]="activeFilter === f"
-        (click)="activeFilter = f">
-        {{ f === 'All' ? 'All' : (f.charAt(0).toUpperCase() + f.slice(1)) }}
-        <span class="filter-chip__count">{{ filterCount(f) }}</span>
-      </button>
-    }
+  <!-- ── Channel filter chips ─────────────────────────────────────────────── -->
+  <div class="filter-section">
+    <span class="filter-section__label">Channel</span>
+    <div class="filter-chips">
+      @for (cf of channelFilters; track cf) {
+        <button
+          class="filter-chip"
+          [class.filter-chip--active]="activeChannelFilter === cf"
+          (click)="activeChannelFilter = cf">
+          {{ channelFilterLabel(cf) }}
+          <span class="filter-chip__count">{{ channelFilterCount(cf) }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Status filter chips ──────────────────────────────────────────────── -->
+  <div class="filter-section">
+    <span class="filter-section__label">Status</span>
+    <div class="filter-chips">
+      @for (f of filters; track f) {
+        <button
+          class="filter-chip"
+          [class.filter-chip--active]="activeFilter === f"
+          (click)="activeFilter = f">
+          {{ f === 'All' ? 'All' : (f.charAt(0).toUpperCase() + f.slice(1)) }}
+          <span class="filter-chip__count">{{ filterCount(f) }}</span>
+        </button>
+      }
+    </div>
   </div>
 
   <!-- ── Loading skeletons ─────────────────────────────────────────────────── -->
@@ -37,7 +62,9 @@
   @if (!loading && filteredReminders.length === 0) {
     <app-empty-state
       title="No reminders found"
-      [description]="activeFilter === 'All' ? 'Reminders will appear here once appointments are scheduled.' : 'No ' + activeFilter + ' reminders.'"
+      [description]="activeChannelFilter !== 'All' || activeFilter !== 'All'
+        ? 'No ' + (activeChannelFilter !== \'All\' ? channelFilterLabel(activeChannelFilter) + \' \' : \'\') + (activeFilter !== \'All\' ? activeFilter + \' \' : \'\') + \'reminders found.\'
+        : 'Reminders will appear here once appointments are scheduled.'"
       icon="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9">
     </app-empty-state>
   }
@@ -59,7 +86,7 @@
         </thead>
         <tbody>
           @for (r of filteredReminders; track r.id) {
-            <tr class="rem-table__row">
+            <tr class="rem-table__row rem-table__row--clickable" (click)="openDrawer(r)" role="button" tabindex="0" (keydown.enter)="openDrawer(r)">
               <td class="col-id rem-id">{{ shortId(r.id) }}</td>
               <td class="col-appt rem-appt">{{ r.appointmentTitle }}</td>
               <td class="col-contact rem-contact">{{ r.contactName }}</td>
@@ -76,6 +103,15 @@
         </tbody>
       </table>
     </div>
+  }
+
+  <!-- ── Reminder detail drawer ────────────────────────────────────────────── -->
+  @if (drawerOpen) {
+    <app-reminder-detail-drawer
+      [reminderId]="selectedReminderId"
+      (closed)="closeDrawer()"
+      (retried)="onRetried($event)">
+    </app-reminder-detail-drawer>
   }
 
 </app-app-shell>

@@ -39,6 +39,14 @@ export const APP_ROUTES: Routes = [
     loadChildren: () => import('./features/billing/billing.module').then(m => m.BillingModule)
   },
   {
+    path: 'settings/email-template',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/pages/template-editor/template-editor.component').then(
+        m => m.TemplateEditorComponent
+      ),
+  },
+  {
     path: 'offline',
     loadComponent: () =>
       import('./features/offline/offline.component').then(m => m.OfflineComponent)

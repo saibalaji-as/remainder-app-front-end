@@ -459,3 +459,42 @@
     border-top: 1px solid var(--border);
   }
 }
+
+// ── Notes textarea ─────────────────────────────────────────────────────────
+
+.form-textarea {
+  resize: vertical;
+  min-height: 5rem;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-label__optional {
+  font-weight: 400;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.form-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+
+.form-char-count {
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+
+  &--warn {
+    color: var(--destructive);
+    font-weight: 600;
+  }
+}

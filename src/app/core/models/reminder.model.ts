@@ -1,15 +1,14 @@
-// Matches backend Reminder Sequelize model fields
+// Matches Supabase reminders table column names (snake_case)
 export type DeliveryStatus = 'pending' | 'sent' | 'failed';
 export type ReminderChannel = 'sms' | 'email' | 'both';
 
 export interface Reminder {
-  id: number;
-  tenant_id: number;
-  appointmentId: number;
+  id: string;
+  appointment_id: string;
   channel: ReminderChannel;
   status: DeliveryStatus;
-  scheduledFor: string;   // ISO datetime
-  sentAt: string | null;
-  createdAt: string;
-  updatedAt: string;
+  scheduled_at: string;   // ISO datetime
+  sent_at: string | null;
+  created_at: string;
+  updated_at: string;
 }

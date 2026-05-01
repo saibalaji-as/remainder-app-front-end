@@ -203,9 +203,9 @@
         @for (reminder of statsResponse!.recentReminders; track reminder.id) {
           <div class="list-item">
             <div class="list-item__info">
-              <span class="list-item__title">{{ reminder.appointment_id }}</span>
+              <span class="list-item__title">{{ reminder.appointment_title }}</span>
               <span class="list-item__sub">
-                {{ formatRelativeTime(reminder.sent_at) }}
+                {{ reminder.channel | uppercase }} · {{ formatRelativeTime(reminder.sent_at ?? reminder.scheduled_at) }}
               </span>
             </div>
             <div class="list-item__meta">

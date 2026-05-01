@@ -36,8 +36,11 @@ export interface UpcomingAppointment {
 export interface RecentReminder {
   id: string;
   status: string;
-  sent_at: string;
+  sent_at: string | null;
+  scheduled_at: string;
   appointment_id: string;
+  channel: string;
+  appointment_title: string;
 }
 
 export interface DashboardStatsResponse {

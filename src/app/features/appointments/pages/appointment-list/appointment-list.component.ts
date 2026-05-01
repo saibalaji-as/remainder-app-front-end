@@ -54,7 +54,8 @@ export class AppointmentListComponent implements OnInit {
     contactId:       [null as number | null, Validators.required],
     title:           ['', Validators.required],
     scheduledAt:     ['', Validators.required],
-    reminderChannel: ['sms' as ReminderChannel, Validators.required]
+    reminderChannel: ['sms' as ReminderChannel, Validators.required],
+    notes:           ['', [Validators.maxLength(500)]],
   });
 
   constructor(
@@ -106,7 +107,8 @@ export class AppointmentListComponent implements OnInit {
     this.api.get<Appointment[]>('/appointments').subscribe({
       next: (data) => {
         this.appointments = data.sort((a, b) =>
-          new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime()
+          new Date(b.scheduled_at ?? b.scheduledAt ?? '').getTime() -
+          new Date(a.scheduled_at ?? a.scheduledAt ?? '').getTime()
         );
         this.loading = false;
       },
@@ -133,17 +135,18 @@ export class AppointmentListComponent implements OnInit {
       this.addForm.get('scheduledAt')?.setErrors({ pastDate: true });
       return;
     }
-    const { contactId, title, scheduledAt, reminderChannel } = this.addForm.value;
+    const { contactId, title, scheduledAt, reminderChannel, notes } = this.addForm.value;
     const dto: AppointmentCreateDto = {
       contactId: contactId!,
       title: title!,
       scheduledAt: new Date(scheduledAt!).toISOString(),
-      reminderChannel: reminderChannel!
+      reminderChannel: reminderChannel!,
+      notes: notes || undefined,
     };
     this.api.post<Appointment>('/appointments', dto).subscribe({
       next: () => {
         this.toast.success('Appointment created.');
-        this.addForm.reset({ reminderChannel: 'sms' });
+        this.addForm.reset({ reminderChannel: 'sms', notes: '' });
         this.showAddForm = false;
         this.loadAppointments();
       },
@@ -152,7 +155,7 @@ export class AppointmentListComponent implements OnInit {
   }
 
   getContactName(appointment: Appointment): string {
-    return appointment.Contact?.name ?? `Contact #${appointment.contactId}`;
+    return appointment.contacts?.name ?? appointment.Contact?.name ?? `Contact #${appointment.contact_id ?? appointment.contactId}`;
   }
 
   deleteAppointment(appointment: Appointment): void {

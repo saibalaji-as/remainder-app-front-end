@@ -60,6 +60,26 @@
             </select>
           </div>
 
+          <div class="form-group form-group--full">
+            <label class="form-label">Notes <span class="form-label__optional">(optional)</span></label>
+            <textarea
+              class="form-input form-textarea"
+              formControlName="notes"
+              placeholder="e.g. Please bring your insurance card"
+              rows="3"
+              maxlength="500">
+            </textarea>
+            <div class="form-hint">
+              <span>Included in the email reminder sent to the contact.</span>
+              <span class="form-char-count" [class.form-char-count--warn]="(addForm.get('notes')?.value?.length ?? 0) > 450">
+                {{ addForm.get('notes')?.value?.length ?? 0 }}/500
+              </span>
+            </div>
+            @if (addForm.get('notes')?.hasError('maxlength')) {
+              <span class="form-error">Notes cannot exceed 500 characters</span>
+            }
+          </div>
+
           <div class="form-actions">
             <button class="btn-gradient-pill" type="submit">Save</button>
             <button class="btn-ghost" type="button" (click)="showAddForm = false">Cancel</button>
@@ -148,9 +168,9 @@
                   <span class="contact-name">{{ getContactName(a) }}</span>
                 </div>
               </td>
-              <td class="col-scheduled appt-date">{{ formatDateTime(a.scheduledAt) }}</td>
+              <td class="col-scheduled appt-date">{{ formatDateTime(a.scheduled_at ?? a.scheduledAt ?? '') }}</td>
               <td class="col-channel">
-                <app-channel-chip [channel]="a.reminderChannel"></app-channel-chip>
+                <app-channel-chip [channel]="a.reminder_channel ?? a.reminderChannel ?? 'sms'"></app-channel-chip>
               </td>
               <td class="col-status">
                 <app-status-pill [status]="a.status"></app-status-pill>
@@ -196,8 +216,8 @@
             <span class="mobile-card__contact-name">{{ getContactName(a) }}</span>
           </div>
           <div class="mobile-card__meta">
-            <span class="mobile-card__date">{{ formatDateTime(a.scheduledAt) }}</span>
-            <app-channel-chip [channel]="a.reminderChannel"></app-channel-chip>
+            <span class="mobile-card__date">{{ formatDateTime(a.scheduled_at ?? a.scheduledAt ?? '') }}</span>
+            <app-channel-chip [channel]="a.reminder_channel ?? a.reminderChannel ?? 'sms'"></app-channel-chip>
           </div>
           <div class="mobile-card__actions">
             <button class="btn-icon-danger" aria-label="Delete appointment" (click)="deleteAppointment(a)">

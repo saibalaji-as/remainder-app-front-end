@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { SseService } from '../../../../core/services/sse.service';
 import { Reminder } from '../../../../core/models/reminder.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { Contact } from '../../../../core/models/contact.model';
+import { EmailSentEvent } from '../../../../core/models/sse-event.model';
 import {
   AppShellComponent,
   PageHeaderComponent,
@@ -14,20 +16,28 @@ import {
   SkeletonLoaderComponent,
   EmptyStateComponent,
 } from '../../../../shared/components/index';
+import { ReminderDetailDrawerComponent } from '../../components/reminder-detail-drawer/reminder-detail-drawer.component';
 
 /** UI-only view model joining Reminder + Appointment + Contact data */
 interface ReminderRow {
-  id: number;
-  appointmentId: number;
+  id: string;
+  appointmentId: string;
   channel: 'sms' | 'email' | 'both';
   status: 'pending' | 'sent' | 'failed';
   scheduledFor: string;
   sentAt: string | null;
   appointmentTitle: string;
   contactName: string;
+  contactEmail: string;
 }
 
-type ReminderFilter = 'All' | 'pending' | 'sent' | 'failed';
+type ReminderFilter  = 'All' | 'pending' | 'sent' | 'failed';
+type ChannelFilter   = 'All' | 'email' | 'sms';
+
+/** Exponential back-off config for SSE reconnect */
+const SSE_BASE_DELAY_MS  = 1_000;
+const SSE_MAX_DELAY_MS   = 30_000;
+const SSE_JITTER_FACTOR  = 0.1;   // ±10 %
 
 @Component({
   selector: 'app-reminder-log',
@@ -40,40 +50,133 @@ type ReminderFilter = 'All' | 'pending' | 'sent' | 'failed';
     StatusPillComponent,
     SkeletonLoaderComponent,
     EmptyStateComponent,
+    ReminderDetailDrawerComponent,
   ],
   templateUrl: './reminder-log.component.html',
   styleUrls: ['./reminder-log.component.scss']
 })
-export class ReminderLogComponent implements OnInit {
+export class ReminderLogComponent implements OnInit, OnDestroy {
   rows: ReminderRow[] = [];
   loading = false;
 
-  /** Active filter chip — 'All' shows every reminder */
+  // ── Status filter ─────────────────────────────────────────────────────────
   activeFilter: ReminderFilter = 'All';
-
   filters: ReminderFilter[] = ['All', 'pending', 'sent', 'failed'];
+
+  // ── Channel filter ────────────────────────────────────────────────────────
+  activeChannelFilter: ChannelFilter = 'All';
+  channelFilters: ChannelFilter[] = ['All', 'email', 'sms'];
+
+  // ── Drawer state ──────────────────────────────────────────────────────────
+  selectedReminderId: string | null = null;
+  drawerOpen = false;
+
+  // ── SSE state ─────────────────────────────────────────────────────────────
+  sseConnected = false;
+  private sseSub?: Subscription;
+  private sseRetryCount = 0;
+  private sseRetryTimer?: ReturnType<typeof setTimeout>;
 
   constructor(
     private api: ApiService,
-    private toast: ToastService
+    private toast: ToastService,
+    private sseService: SseService,
   ) {}
 
   ngOnInit(): void {
     this.loadData();
+    this.connectSse();
+  }
+
+  ngOnDestroy(): void {
+    this.sseSub?.unsubscribe();
+    if (this.sseRetryTimer) clearTimeout(this.sseRetryTimer);
   }
 
   // ── Computed getters ──────────────────────────────────────────────────────
 
-  /** Reminders filtered by the active chip */
+  /** Reminders matching both the active channel filter and status filter */
   get filteredReminders(): ReminderRow[] {
-    if (this.activeFilter === 'All') return this.rows;
-    return this.rows.filter(r => r.status === this.activeFilter);
+    return this.rows.filter(r => {
+      const channelMatch = this.matchesChannelFilter(r, this.activeChannelFilter);
+      const statusMatch  = this.activeFilter === 'All' || r.status === this.activeFilter;
+      return channelMatch && statusMatch;
+    });
   }
 
-  /** Count of reminders matching a given filter value */
+  /** Count of reminders matching a given status filter (ignores channel filter) */
   filterCount(filter: ReminderFilter): number {
     if (filter === 'All') return this.rows.length;
     return this.rows.filter(r => r.status === filter).length;
+  }
+
+  /** Count of reminders matching a given channel filter (ignores status filter) */
+  channelFilterCount(filter: ChannelFilter): number {
+    if (filter === 'All') return this.rows.length;
+    return this.rows.filter(r => this.matchesChannelFilter(r, filter)).length;
+  }
+
+  private matchesChannelFilter(row: ReminderRow, filter: ChannelFilter): boolean {
+    if (filter === 'All') return true;
+    if (filter === 'email') return row.channel === 'email' || row.channel === 'both';
+    if (filter === 'sms')   return row.channel === 'sms'   || row.channel === 'both';
+    return true;
+  }
+
+  // ── Drawer ────────────────────────────────────────────────────────────────
+
+  openDrawer(row: ReminderRow): void {
+    this.selectedReminderId = row.id;
+    this.drawerOpen = true;
+  }
+
+  closeDrawer(): void {
+    this.drawerOpen = false;
+    this.selectedReminderId = null;
+  }
+
+  onRetried(_reminderId: string): void {
+    this.closeDrawer();
+    this.loadData();
+  }
+
+  // ── SSE ───────────────────────────────────────────────────────────────────
+
+  private connectSse(): void {
+    this.sseSub?.unsubscribe();
+
+    this.sseSub = this.sseService.connect('/sse/reminders').subscribe({
+      next: (event: MessageEvent) => {
+        this.sseConnected = true;
+        this.sseRetryCount = 0;
+
+        if (event.type === 'email-sent') {
+          try {
+            const payload: EmailSentEvent = JSON.parse(event.data);
+            this.onEmailSentEvent(payload);
+          } catch { /* ignore malformed events */ }
+        }
+      },
+      error: () => {
+        this.sseConnected = false;
+        this.scheduleReconnect();
+      },
+    });
+  }
+
+  private scheduleReconnect(): void {
+    const base    = SSE_BASE_DELAY_MS * Math.pow(2, this.sseRetryCount);
+    const capped  = Math.min(base, SSE_MAX_DELAY_MS);
+    const jitter  = capped * SSE_JITTER_FACTOR * (Math.random() * 2 - 1);
+    const delay   = Math.round(capped + jitter);
+
+    this.sseRetryCount++;
+    this.sseRetryTimer = setTimeout(() => this.connectSse(), delay);
+  }
+
+  onEmailSentEvent(event: EmailSentEvent): void {
+    this.toast.success(`Email sent to ${event.contactName} for "${event.appointmentTitle}"`);
+    this.loadData();
   }
 
   // ── Display helpers ───────────────────────────────────────────────────────
@@ -87,9 +190,17 @@ export class ReminderLogComponent implements OnInit {
       + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
-  /** Returns a short monospace ID string, e.g. "#0042" */
-  shortId(id: number): string {
-    return '#' + String(id).padStart(4, '0');
+  /** Returns a short ID string — first 8 chars of the UUID */
+  shortId(id: string | number): string {
+    const s = String(id);
+    return s.length > 8 ? s.slice(0, 8) + '…' : s;
+  }
+
+  channelFilterLabel(filter: ChannelFilter): string {
+    if (filter === 'All')   return 'All';
+    if (filter === 'email') return 'Email';
+    if (filter === 'sms')   return 'SMS';
+    return filter;
   }
 
   // ── API calls ─────────────────────────────────────────────────────────────
@@ -102,24 +213,24 @@ export class ReminderLogComponent implements OnInit {
       contacts:     this.api.get<Contact[]>('/contacts'),
     }).subscribe({
       next: ({ reminders, appointments, contacts }) => {
-        // Build lookup maps for O(1) joins
-        const apptMap = new Map<number, Appointment>(appointments.map(a => [a.id, a]));
-        const contactMap = new Map<number, Contact>(contacts.map(c => [c.id, c]));
+        const apptMap    = new Map<string, Appointment>(appointments.map(a => [a.id, a]));
+        const contactMap = new Map<string, Contact>(contacts.map(c => [String(c.id), c]));
 
         this.rows = reminders.map(r => {
-          const appt = apptMap.get(r.appointmentId);
-          const contactId = appt?.contactId;
-          const contact = contactId != null ? contactMap.get(contactId) : undefined;
+          const appt      = apptMap.get(r.appointment_id);
+          const contactId = appt?.contact_id;
+          const contact   = contactId != null ? contactMap.get(String(contactId)) : undefined;
 
           return {
             id:               r.id,
-            appointmentId:    r.appointmentId,
+            appointmentId:    r.appointment_id,
             channel:          r.channel,
             status:           r.status,
-            scheduledFor:     r.scheduledFor,
-            sentAt:           r.sentAt,
-            appointmentTitle: appt?.title ?? `Appointment #${r.appointmentId}`,
-            contactName:      contact?.name ?? (appt?.Contact?.name ?? `Contact #${contactId ?? '?'}`),
+            scheduledFor:     r.scheduled_at,
+            sentAt:           r.sent_at,
+            appointmentTitle: appt?.title ?? `Appointment #${r.appointment_id}`,
+            contactName:      contact?.name  ?? (appt?.contacts?.name  ?? `Contact #${contactId ?? '?'}`),
+            contactEmail:     contact?.email ?? (appt?.contacts?.email ?? ''),
           };
         });
 

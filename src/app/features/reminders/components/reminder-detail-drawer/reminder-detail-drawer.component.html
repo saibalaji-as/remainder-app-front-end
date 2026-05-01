@@ -1,0 +1,127 @@
+<!-- Backdrop -->
+<div class="drawer-backdrop" (click)="close()" aria-hidden="true"></div>
+
+<!-- Drawer panel -->
+<aside class="drawer-panel" role="dialog" aria-modal="true" aria-label="Reminder Details">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <h2 class="drawer-title">Reminder Details</h2>
+    <button class="drawer-close" (click)="close()" aria-label="Close drawer">×</button>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading) {
+    <div class="drawer-body">
+      <div class="skeleton-rows">
+        @for (i of [1,2,3,4,5,6,7]; track i) {
+          <div class="skeleton-row">
+            <app-skeleton-loader width="6rem" height="0.75rem"></app-skeleton-loader>
+            <app-skeleton-loader width="60%" height="1rem"></app-skeleton-loader>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading && error) {
+    <div class="drawer-body">
+      <div class="drawer-error">
+        <p class="drawer-error__message">{{ error }}</p>
+        <button class="btn btn--secondary" (click)="load()">Try again</button>
+      </div>
+    </div>
+  }
+
+  <!-- Detail content -->
+  @if (!loading && !error && detail) {
+    <div class="drawer-body">
+
+      <dl class="detail-list">
+
+        <!-- Reminder ID -->
+        <div class="detail-row">
+          <dt class="detail-label">Reminder ID</dt>
+          <dd class="detail-value detail-value--mono">{{ shortId(detail.id) }}</dd>
+        </div>
+
+        <!-- Channel -->
+        <div class="detail-row">
+          <dt class="detail-label">Channel</dt>
+          <dd class="detail-value">
+            <app-channel-chip [channel]="detail.channel"></app-channel-chip>
+          </dd>
+        </div>
+
+        <!-- Status -->
+        <div class="detail-row">
+          <dt class="detail-label">Status</dt>
+          <dd class="detail-value">
+            <app-status-pill [status]="detail.status"></app-status-pill>
+          </dd>
+        </div>
+
+        <!-- Scheduled For -->
+        <div class="detail-row">
+          <dt class="detail-label">Scheduled For</dt>
+          <dd class="detail-value">{{ formatDateTime(detail.scheduledFor) }}</dd>
+        </div>
+
+        <!-- Sent At -->
+        <div class="detail-row">
+          <dt class="detail-label">Sent At</dt>
+          <dd class="detail-value">{{ formatDateTime(detail.sentAt) }}</dd>
+        </div>
+
+        <!-- Appointment -->
+        <div class="detail-row">
+          <dt class="detail-label">Appointment</dt>
+          <dd class="detail-value">{{ detail.appointmentTitle }}</dd>
+        </div>
+
+        <!-- Contact Name -->
+        <div class="detail-row">
+          <dt class="detail-label">Contact</dt>
+          <dd class="detail-value">{{ detail.contactName }}</dd>
+        </div>
+
+        <!-- Contact Email (only for email or both channels) -->
+        @if (detail.channel === 'email' || detail.channel === 'both') {
+          <div class="detail-row">
+            <dt class="detail-label">Email</dt>
+            <dd class="detail-value">{{ detail.contactEmail }}</dd>
+          </div>
+        }
+
+        <!-- Notes (only when non-empty) -->
+        @if (detail.appointmentNotes) {
+          <div class="detail-row detail-row--notes">
+            <dt class="detail-label">Notes</dt>
+            <dd class="detail-value detail-value--notes">{{ detail.appointmentNotes }}</dd>
+          </div>
+        }
+
+      </dl>
+
+      <!-- Retry button: shown only for failed email/both reminders -->
+      @if (detail.status === 'failed' && (detail.channel === 'email' || detail.channel === 'both')) {
+        <div class="drawer-actions">
+          <button
+            class="btn btn--danger"
+            [disabled]="retrying"
+            (click)="retry()">
+            @if (retrying) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              Retrying…
+            } @else {
+              Retry Reminder
+            }
+          </button>
+        </div>
+      }
+
+    </div>
+  }
+
+</aside>
