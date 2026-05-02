@@ -18,16 +18,16 @@ export const ALLOWED_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]>
 
 export interface Appointment {
   id: string;
-  tenant_id: string;
-  contact_id: string;
+  tenant_id?: string;
+  contact_id?: string;
   title: string;
-  scheduled_at: string;       // ISO 8601 datetime string
-  reminder_channel: ReminderChannel;
+  scheduled_at?: string;      // ISO 8601 datetime string (snake_case from Supabase)
+  reminder_channel?: ReminderChannel;
   status: AppointmentStatus;
   confirmation_token?: string;
   notes?: string;             // optional, max 500 chars
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   contacts?: {                // included via Supabase join on GET /appointments
     id: string;
     name: string;
