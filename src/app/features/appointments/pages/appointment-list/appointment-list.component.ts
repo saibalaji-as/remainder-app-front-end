@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { DialogService } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { Appointment, AppointmentCreateDto, ReminderChannel } from '../../../../core/models/appointment.model';
+import { SseService } from '../../../../core/services/sse.service';
+import { Appointment, AppointmentCreateDto, ReminderChannel, AppointmentStatus, ALLOWED_TRANSITIONS } from '../../../../core/models/appointment.model';
 import { Contact } from '../../../../core/models/contact.model';
+import { NudgeEvent } from '../../../../core/models/confirm.model';
+import { NudgeBannerComponent } from '../../../../shared/components/nudge-banner/nudge-banner.component';
 import {
   AppShellComponent,
   PageHeaderComponent,
@@ -29,25 +33,34 @@ type AppointmentTab = 'All' | 'scheduled' | 'confirmed' | 'completed' | 'cancell
     StatusPillComponent,
     SkeletonLoaderComponent,
     EmptyStateComponent,
+    NudgeBannerComponent,
+    TitleCasePipe,
   ],
   templateUrl: './appointment-list.component.html',
   styleUrls: ['./appointment-list.component.scss']
 })
-export class AppointmentListComponent implements OnInit {
+export class AppointmentListComponent implements OnInit, OnDestroy {
   appointments: Appointment[] = [];
   contacts: Contact[] = [];
   loading = false;
   showAddForm = false;
+  updatingStatusId: string | null = null;
+  nudgeEvent: NudgeEvent | null = null;
+  private sseSubscription?: Subscription;
 
   /** Active status tab — 'All' shows every appointment */
   activeTab: AppointmentTab = 'All';
 
   tabs: AppointmentTab[] = ['All', 'scheduled', 'confirmed', 'completed', 'cancelled'];
 
-  reminderChannels: { value: ReminderChannel; label: string }[] = [
-    { value: 'sms',   label: 'SMS' },
-    { value: 'email', label: 'Email' },
-    { value: 'both',  label: 'SMS & Email' }
+  reminderChannels: { value: ReminderChannel; label: string; helperText?: string }[] = [
+    { value: 'sms',            label: 'SMS' },
+    { value: 'email',          label: 'Email' },
+    { value: 'both',           label: 'SMS & Email' },
+    { value: 'whatsapp',       label: 'WhatsApp',         helperText: 'Contact must have a valid phone number on file.' },
+    { value: 'whatsapp_sms',   label: 'WhatsApp & SMS',   helperText: 'Contact must have a valid phone number on file.' },
+    { value: 'whatsapp_email', label: 'WhatsApp & Email', helperText: 'Contact must have a valid phone number on file.' },
+    { value: 'all',            label: 'All Channels',     helperText: 'Contact must have a valid phone number on file.' },
   ];
 
   addForm = this.fb.group({
@@ -62,12 +75,31 @@ export class AppointmentListComponent implements OnInit {
     private fb: FormBuilder,
     private api: ApiService,
     private toast: ToastService,
-    private dialog: DialogService
+    private dialog: DialogService,
+    private sseService: SseService
   ) {}
 
   ngOnInit(): void {
     this.loadAppointments();
     this.loadContacts();
+    this.sseSubscription = this.sseService.connect('/sse/reminders').subscribe({
+      next: (event: MessageEvent) => {
+        const eventType = event.type;
+        if (['appointment-confirmed', 'appointment-cancelled', 'appointment-completed'].includes(eventType)) {
+          this.loadAppointments();
+        } else if (eventType === 'appointment-needs-update') {
+          try {
+            const data: NudgeEvent = JSON.parse(event.data);
+            this.onNudgeEvent(data);
+          } catch {}
+        }
+      },
+      error: () => {} // SSE errors are handled silently
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sseSubscription?.unsubscribe();
   }
 
   // ── Computed getters ──────────────────────────────────────────────────────
@@ -84,6 +116,12 @@ export class AppointmentListComponent implements OnInit {
     return this.appointments.filter(a => a.status === status).length;
   }
 
+  get isWhatsAppChannel(): boolean {
+    const ch = this.addForm.get('reminderChannel')?.value;
+    return ch === 'whatsapp' || ch === 'whatsapp_sms'
+        || ch === 'whatsapp_email' || ch === 'all';
+  }
+
   // ── Display helpers ───────────────────────────────────────────────────────
 
   /** Returns the first letter of a name, uppercased */
@@ -98,6 +136,51 @@ export class AppointmentListComponent implements OnInit {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       + ' · '
       + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
+  // ── Status update ─────────────────────────────────────────────────────────
+
+  allowedTransitions(status: string): AppointmentStatus[] {
+    return ALLOWED_TRANSITIONS[status as AppointmentStatus] ?? [];
+  }
+
+  updateStatus(appointmentId: string, newStatus: AppointmentStatus): void {
+    this.updatingStatusId = appointmentId;
+    const index = this.appointments.findIndex(a => a.id === appointmentId);
+    const oldStatus = index !== -1 ? this.appointments[index].status : null;
+
+    // Optimistic update
+    if (index !== -1) {
+      this.appointments[index] = { ...this.appointments[index], status: newStatus };
+    }
+
+    this.api.patch<Appointment>(`/appointments/${appointmentId}/status`, { status: newStatus }).subscribe({
+      next: () => {
+        this.updatingStatusId = null;
+      },
+      error: () => {
+        // Revert optimistic update
+        if (index !== -1 && oldStatus !== null) {
+          this.appointments[index] = { ...this.appointments[index], status: oldStatus };
+        }
+        this.toast.error('Failed to update appointment status.');
+        this.updatingStatusId = null;
+      }
+    });
+  }
+
+  onNudgeEvent(event: NudgeEvent): void {
+    this.nudgeEvent = event;
+  }
+
+  openStatusUpdate(appointmentId: string): void {
+    const el = document.getElementById(`appt-row-${appointmentId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('appt-table__row--highlight');
+      setTimeout(() => el.classList.remove('appt-table__row--highlight'), 2000);
+    }
+    this.nudgeEvent = null;
   }
 
   // ── API calls ─────────────────────────────────────────────────────────────

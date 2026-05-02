@@ -256,15 +256,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
 
     // Donut chart — read from statsResponse.pieData
-    const smsCount   = this.statsResponse?.pieData?.sms   ?? 0;
-    const emailCount = this.statsResponse?.pieData?.email ?? 0;
+    const whatsappColor  = '#25D366';  // WhatsApp brand green
+    const smsCount       = this.statsResponse?.pieData?.sms       ?? 0;
+    const emailCount     = this.statsResponse?.pieData?.email     ?? 0;
+    const whatsappCount  = this.statsResponse?.pieData?.whatsapp  ?? 0;
 
     this.donutChartData = {
-      labels: ['SMS', 'Email'],
+      labels: ['SMS', 'Email', 'WhatsApp'],
       datasets: [
         {
-          data: [smsCount, emailCount],
-          backgroundColor: [smsColor, reminderColor],
+          data: [smsCount, emailCount, whatsappCount],
+          backgroundColor: [smsColor, reminderColor, whatsappColor],
           borderColor: 'transparent',
           borderWidth: 0,
           hoverOffset: 4,
@@ -272,10 +274,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       ],
     };
 
-    // Build manual legend — exactly two entries
+    // Build manual legend — three entries including WhatsApp
     this.donutLegend = [
-      { label: 'SMS',   color: smsColor,      count: smsCount   },
-      { label: 'Email', color: reminderColor, count: emailCount },
+      { label: 'SMS',      color: smsColor,      count: smsCount      },
+      { label: 'Email',    color: reminderColor, count: emailCount    },
+      { label: 'WhatsApp', color: whatsappColor, count: whatsappCount },
     ];
   }
 

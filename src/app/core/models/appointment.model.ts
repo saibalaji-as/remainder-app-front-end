@@ -1,6 +1,20 @@
 // Matches Supabase appointments table column names (snake_case)
-export type ReminderChannel = 'sms' | 'email' | 'both';
-export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled';
+export type ReminderChannel =
+  | 'sms'
+  | 'email'
+  | 'both'
+  | 'whatsapp'
+  | 'whatsapp_sms'
+  | 'whatsapp_email'
+  | 'all';
+export type AppointmentStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+
+export const ALLOWED_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
+  scheduled:  ['confirmed', 'cancelled'],
+  confirmed:  ['completed', 'cancelled'],
+  completed:  [],
+  cancelled:  [],
+};
 
 export interface Appointment {
   id: string;
@@ -10,6 +24,7 @@ export interface Appointment {
   scheduled_at: string;       // ISO 8601 datetime string
   reminder_channel: ReminderChannel;
   status: AppointmentStatus;
+  confirmation_token?: string;
   notes?: string;             // optional, max 500 chars
   created_at: string;
   updated_at: string;

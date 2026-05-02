@@ -49,6 +49,7 @@ export interface DashboardStatsResponse {
   pieData: {
     sms: number;
     email: number;
+    whatsapp: number;
   };
   upcomingAppointments: UpcomingAppointment[];
   recentReminders: RecentReminder[];

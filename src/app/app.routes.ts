@@ -47,6 +47,13 @@ export const APP_ROUTES: Routes = [
       ),
   },
   {
+    path: 'confirm',
+    loadComponent: () =>
+      import('./features/confirm/confirm.component').then(
+        m => m.ConfirmationPageComponent
+      ),
+  },
+  {
     path: 'offline',
     loadComponent: () =>
       import('./features/offline/offline.component').then(m => m.OfflineComponent)

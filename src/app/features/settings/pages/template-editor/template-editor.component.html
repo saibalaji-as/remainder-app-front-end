@@ -61,7 +61,7 @@
             type="text"
             formControlName="subject"
             maxlength="150"
-            placeholder="Appointment Reminder — {{appointmentDate}}"
+            placeholder="Appointment Reminder — &#123;&#123;appointmentDate&#125;&#125;"
             (input)="onFieldChange()"
           />
           <p class="form-hint">Merge tags: <code>&#123;&#123;contactName&#125;&#125;</code>, <code>&#123;&#123;appointmentDate&#125;&#125;</code></p>
@@ -85,7 +85,7 @@
             [class.form-input--error]="form.get('greeting')?.invalid && form.get('greeting')?.touched"
             type="text"
             formControlName="greeting"
-            placeholder="Hi {{contactName}},"
+            placeholder="Hi &#123;&#123;contactName&#125;&#125;,"
             (input)="onFieldChange()"
           />
           <p class="form-hint">e.g. <code>Hi &#123;&#123;contactName&#125;&#125;,</code></p>

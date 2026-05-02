@@ -31,6 +31,11 @@ export class TemplateEditorComponent implements OnInit {
   preview = '';
   validationWarnings: string[] = [];
 
+  // Exposed so the template can reference them in hint/placeholder text
+  readonly contactName = '{{contactName}}';
+  readonly appointmentDate = '{{appointmentDate}}';
+  readonly notes = '{{notes}}';
+
   private readonly sampleContext = {
     contactName: 'Jane Smith',
     appointmentDate: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),

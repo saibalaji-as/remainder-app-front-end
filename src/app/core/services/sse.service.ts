@@ -40,8 +40,15 @@ export class SseService {
       const namedEventHandler = (event: MessageEvent) => {
         observer.next(event);
       };
-      eventSource.addEventListener('email-sent', namedEventHandler);
-      eventSource.addEventListener('connected', namedEventHandler);
+      const namedEvents = [
+        'email-sent',
+        'connected',
+        'appointment-confirmed',
+        'appointment-cancelled',
+        'appointment-completed',
+        'appointment-needs-update',
+      ];
+      namedEvents.forEach(name => eventSource.addEventListener(name, namedEventHandler));
 
       eventSource.onerror = () => {
         eventSource.close();
@@ -50,8 +57,7 @@ export class SseService {
 
       // Teardown: close the EventSource when the Observable is unsubscribed
       return () => {
-        eventSource.removeEventListener('email-sent', namedEventHandler);
-        eventSource.removeEventListener('connected', namedEventHandler);
+        namedEvents.forEach(name => eventSource.removeEventListener(name, namedEventHandler));
         eventSource.close();
       };
     });

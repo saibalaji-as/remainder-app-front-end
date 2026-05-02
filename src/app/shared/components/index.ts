@@ -8,3 +8,4 @@ export { EmptyStateComponent } from './empty-state/empty-state.component';
 export { SkeletonLoaderComponent } from './skeleton-loader/skeleton-loader.component';
 export { AppShellComponent } from './app-shell/app-shell.component';
 export { AuthShellComponent } from './auth-shell/auth-shell.component';
+export { NudgeBannerComponent } from './nudge-banner/nudge-banner.component';

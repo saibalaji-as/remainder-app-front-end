@@ -1,0 +1,147 @@
+<div class="confirm-page">
+
+  <!-- ── Brand header ──────────────────────────────────────────────────────── -->
+  <header class="confirm-header">
+    <div class="confirm-header__brand">
+      <span class="confirm-header__icon">📅</span>
+      <span class="confirm-header__name">Schedify</span>
+    </div>
+  </header>
+
+  <!-- ── Main card ─────────────────────────────────────────────────────────── -->
+  <main class="confirm-card">
+
+    <!-- Loading skeleton -->
+    @if (loading) {
+      <div class="skeleton-wrap" aria-busy="true" aria-label="Loading appointment details">
+        <div class="skeleton skeleton--title"></div>
+        <div class="skeleton skeleton--line"></div>
+        <div class="skeleton skeleton--line skeleton--line-short"></div>
+      </div>
+    }
+
+    <!-- Error state -->
+    @if (!loading && error && !responded) {
+      <div class="error-card" role="alert">
+        <div class="error-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="error-card__body">
+          <p class="error-card__title">Something went wrong</p>
+          <p class="error-card__message">{{ error }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Success / responded state -->
+    @if (responded) {
+      <div class="success-state" role="status" #successState tabindex="-1">
+        @if (responseType === 'yes') {
+          <div class="success-state__icon success-state__icon--yes" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h2 class="success-state__title">You're confirmed!</h2>
+          <p class="success-state__message">See you then. We look forward to your appointment.</p>
+        } @else {
+          <div class="success-state__icon success-state__icon--no" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </div>
+          <h2 class="success-state__title">Appointment cancelled</h2>
+          <p class="success-state__message">Got it. Your appointment has been cancelled.</p>
+        }
+      </div>
+    }
+
+    <!-- Appointment details -->
+    @if (!loading && !responded && appointment) {
+      <div class="appt-details">
+
+        <!-- Title row -->
+        <div class="appt-details__title-row">
+          <h2 class="appt-details__title">{{ appointment.title }}</h2>
+          @if (isAlreadyActioned) {
+            <app-status-pill [status]="appointment.status"></app-status-pill>
+          }
+        </div>
+
+        <!-- Detail rows -->
+        <dl class="appt-details__list">
+          <dt>Contact</dt>
+          <dd>{{ appointment.contactName }}</dd>
+
+          <dt>Date &amp; Time</dt>
+          <dd>{{ appointment.scheduledAt | date: 'MMMM d, y, h:mm a' }}</dd>
+
+          @if (appointment.notes) {
+            <dt>Notes</dt>
+            <dd class="appt-details__notes">{{ appointment.notes }}</dd>
+          }
+        </dl>
+
+        <!-- Inline error after a failed respond() call -->
+        @if (error) {
+          <div class="inline-error" role="alert">{{ error }}</div>
+        }
+
+        <!-- Action buttons -->
+        <div class="appt-actions">
+          <button
+            class="btn-action btn-action--yes"
+            [disabled]="areButtonsDisabled"
+            (click)="respond('yes')"
+            aria-label="Confirm appointment"
+          >
+            @if (responding && responseType === null) {
+              <span class="spinner" aria-hidden="true"></span>
+            } @else {
+              <span aria-hidden="true">✓</span>
+            }
+            Yes, I'll be there
+          </button>
+
+          <button
+            class="btn-action btn-action--no"
+            [disabled]="areButtonsDisabled"
+            (click)="respond('no')"
+            aria-label="Cancel appointment"
+          >
+            @if (responding && responseType === null) {
+              <span class="spinner spinner--light" aria-hidden="true"></span>
+            } @else {
+              <span aria-hidden="true">✗</span>
+            }
+            No, I need to cancel
+          </button>
+        </div>
+
+        @if (isAlreadyActioned) {
+          <p class="already-actioned-note">
+            This appointment has already been
+            <strong>{{ appointment.status }}</strong>.
+            No further action is needed.
+          </p>
+        }
+
+      </div>
+    }
+
+  </main>
+
+  <footer class="confirm-footer">
+    <p>Powered by <strong>Schedify</strong> &mdash; Appointment Reminders</p>
+  </footer>
+
+</div>

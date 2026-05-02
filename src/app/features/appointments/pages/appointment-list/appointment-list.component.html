@@ -1,5 +1,12 @@
 <app-app-shell>
 
+  <!-- ── Nudge banner ─────────────────────────────────────────────────────── -->
+  <app-nudge-banner
+    [nudge]="nudgeEvent"
+    (updateStatus)="openStatusUpdate($event)"
+    (dismissed)="nudgeEvent = null">
+  </app-nudge-banner>
+
   <!-- ── Page header ──────────────────────────────────────────────────────── -->
   <app-page-header title="Appointments">
     <ng-container actions>
@@ -58,6 +65,9 @@
             <select class="form-input form-select" formControlName="reminderChannel">
               <option *ngFor="let ch of reminderChannels" [value]="ch.value">{{ ch.label }}</option>
             </select>
+            @if (isWhatsAppChannel) {
+              <p class="form-hint">Contact must have a valid phone number on file.</p>
+            }
           </div>
 
           <div class="form-group form-group--full">
@@ -153,12 +163,13 @@
             <th class="col-scheduled">Scheduled</th>
             <th class="col-channel">Channel</th>
             <th class="col-status">Status</th>
+            <th class="col-status-actions">Actions</th>
             <th class="col-actions"></th>
           </tr>
         </thead>
         <tbody>
           @for (a of filteredAppointments; track a.id) {
-            <tr class="appt-table__row">
+            <tr class="appt-table__row" [id]="'appt-row-' + a.id">
               <td class="col-title appt-title">{{ a.title }}</td>
               <td class="col-contact">
                 <div class="contact-cell">
@@ -174,6 +185,28 @@
               </td>
               <td class="col-status">
                 <app-status-pill [status]="a.status"></app-status-pill>
+              </td>
+              <td class="col-status-actions">
+                @if (allowedTransitions(a.status).length > 0) {
+                  <div class="status-actions">
+                    @for (transition of allowedTransitions(a.status); track transition) {
+                      <button
+                        class="btn-status-action"
+                        [class.btn-status-action--confirm]="transition === 'confirmed'"
+                        [class.btn-status-action--complete]="transition === 'completed'"
+                        [class.btn-status-action--cancel]="transition === 'cancelled'"
+                        [disabled]="updatingStatusId === a.id"
+                        (click)="updateStatus(a.id, transition)"
+                        [attr.aria-label]="'Mark as ' + transition"
+                      >
+                        @if (updatingStatusId === a.id) {
+                          <span class="btn-spinner" aria-hidden="true"></span>
+                        }
+                        {{ transition | titlecase }}
+                      </button>
+                    }
+                  </div>
+                }
               </td>
               <td class="col-actions">
                 <button class="btn-icon-sm" aria-label="View appointment">
@@ -220,6 +253,21 @@
             <app-channel-chip [channel]="a.reminder_channel ?? a.reminderChannel ?? 'sms'"></app-channel-chip>
           </div>
           <div class="mobile-card__actions">
+            @if (allowedTransitions(a.status).length > 0) {
+              @for (transition of allowedTransitions(a.status); track transition) {
+                <button
+                  class="btn-status-action btn-status-action--sm"
+                  [class.btn-status-action--confirm]="transition === 'confirmed'"
+                  [class.btn-status-action--complete]="transition === 'completed'"
+                  [class.btn-status-action--cancel]="transition === 'cancelled'"
+                  [disabled]="updatingStatusId === a.id"
+                  (click)="updateStatus(a.id, transition)"
+                  [attr.aria-label]="'Mark as ' + transition"
+                >
+                  {{ transition | titlecase }}
+                </button>
+              }
+            }
             <button class="btn-icon-danger" aria-label="Delete appointment" (click)="deleteAppointment(a)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                    fill="none" stroke="currentColor" stroke-width="2"
