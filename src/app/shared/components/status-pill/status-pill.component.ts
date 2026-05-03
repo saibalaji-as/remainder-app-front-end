@@ -15,6 +15,7 @@ const STATUS_TONE_MAP: Record<string, Tone> = {
   overdue: 'danger',
   cancelled: 'muted',
   canceled: 'muted',
+  skipped: 'muted',
 };
 
 const TONE_CLASSES: Record<Tone, string> = {

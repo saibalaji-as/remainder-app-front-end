@@ -22,8 +22,8 @@ import {
 /** Flattened view model for the detail drawer */
 interface ReminderDetail {
   id: string;
-  channel: 'sms' | 'email' | 'both';
-  status: 'pending' | 'sent' | 'failed';
+  channel: 'sms' | 'email' | 'both' | 'whatsapp' | 'whatsapp_sms' | 'whatsapp_email' | 'all';
+  status: 'pending' | 'sent' | 'failed' | 'skipped';
   scheduledFor: string;
   sentAt: string | null;
   appointmentTitle: string;

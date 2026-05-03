@@ -7,7 +7,7 @@ import { SseService } from '../../../../core/services/sse.service';
 import { Reminder } from '../../../../core/models/reminder.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { Contact } from '../../../../core/models/contact.model';
-import { EmailSentEvent } from '../../../../core/models/sse-event.model';
+import { EmailSentEvent, SmsSentEvent, WhatsAppSentEvent } from '../../../../core/models/sse-event.model';
 import {
   AppShellComponent,
   PageHeaderComponent,
@@ -22,8 +22,8 @@ import { ReminderDetailDrawerComponent } from '../../components/reminder-detail-
 interface ReminderRow {
   id: string;
   appointmentId: string;
-  channel: 'sms' | 'email' | 'both';
-  status: 'pending' | 'sent' | 'failed';
+  channel: 'sms' | 'email' | 'both' | 'whatsapp' | 'whatsapp_sms' | 'whatsapp_email' | 'all';
+  status: 'pending' | 'sent' | 'failed' | 'skipped';
   scheduledFor: string;
   sentAt: string | null;
   appointmentTitle: string;
@@ -31,8 +31,8 @@ interface ReminderRow {
   contactEmail: string;
 }
 
-type ReminderFilter  = 'All' | 'pending' | 'sent' | 'failed';
-type ChannelFilter   = 'All' | 'email' | 'sms';
+type ReminderFilter  = 'All' | 'pending' | 'sent' | 'failed' | 'skipped';
+type ChannelFilter   = 'All' | 'email' | 'sms' | 'whatsapp';
 
 /** Exponential back-off config for SSE reconnect */
 const SSE_BASE_DELAY_MS  = 1_000;
@@ -61,11 +61,11 @@ export class ReminderLogComponent implements OnInit, OnDestroy {
 
   // ── Status filter ─────────────────────────────────────────────────────────
   activeFilter: ReminderFilter = 'All';
-  filters: ReminderFilter[] = ['All', 'pending', 'sent', 'failed'];
+  filters: ReminderFilter[] = ['All', 'pending', 'sent', 'failed', 'skipped'];
 
   // ── Channel filter ────────────────────────────────────────────────────────
   activeChannelFilter: ChannelFilter = 'All';
-  channelFilters: ChannelFilter[] = ['All', 'email', 'sms'];
+  channelFilters: ChannelFilter[] = ['All', 'email', 'sms', 'whatsapp'];
 
   // ── Drawer state ──────────────────────────────────────────────────────────
   selectedReminderId: string | null = null;
@@ -118,8 +118,9 @@ export class ReminderLogComponent implements OnInit, OnDestroy {
 
   private matchesChannelFilter(row: ReminderRow, filter: ChannelFilter): boolean {
     if (filter === 'All') return true;
-    if (filter === 'email') return row.channel === 'email' || row.channel === 'both';
-    if (filter === 'sms')   return row.channel === 'sms'   || row.channel === 'both';
+    if (filter === 'email') return row.channel === 'email' || row.channel === 'both' || row.channel === 'whatsapp_email' || row.channel === 'all';
+    if (filter === 'sms')   return row.channel === 'sms'   || row.channel === 'both' || row.channel === 'whatsapp_sms'   || row.channel === 'all';
+    if (filter === 'whatsapp') return row.channel === 'whatsapp' || row.channel === 'whatsapp_sms' || row.channel === 'whatsapp_email' || row.channel === 'all';
     return true;
   }
 
@@ -155,6 +156,16 @@ export class ReminderLogComponent implements OnInit, OnDestroy {
             const payload: EmailSentEvent = JSON.parse(event.data);
             this.onEmailSentEvent(payload);
           } catch { /* ignore malformed events */ }
+        } else if (event.type === 'sms-sent') {
+          try {
+            const payload: SmsSentEvent = JSON.parse(event.data);
+            this.onSmsSentEvent(payload);
+          } catch { /* ignore malformed events */ }
+        } else if (event.type === 'whatsapp-sent') {
+          try {
+            const payload: WhatsAppSentEvent = JSON.parse(event.data);
+            this.onWhatsAppSentEvent(payload);
+          } catch { /* ignore malformed events */ }
         }
       },
       error: () => {
@@ -179,6 +190,16 @@ export class ReminderLogComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
+  onSmsSentEvent(event: SmsSentEvent): void {
+    this.toast.success(`SMS sent to ${event.contactName} for "${event.appointmentTitle}"`);
+    this.loadData();
+  }
+
+  onWhatsAppSentEvent(event: WhatsAppSentEvent): void {
+    this.toast.success(`WhatsApp sent to ${event.contactName} for "${event.appointmentTitle}"`);
+    this.loadData();
+  }
+
   // ── Display helpers ───────────────────────────────────────────────────────
 
   /** Formats an ISO date string to a human-readable date + time */
@@ -197,9 +218,10 @@ export class ReminderLogComponent implements OnInit, OnDestroy {
   }
 
   channelFilterLabel(filter: ChannelFilter): string {
-    if (filter === 'All')   return 'All';
-    if (filter === 'email') return 'Email';
-    if (filter === 'sms')   return 'SMS';
+    if (filter === 'All')      return 'All';
+    if (filter === 'email')    return 'Email';
+    if (filter === 'sms')      return 'SMS';
+    if (filter === 'whatsapp') return 'WhatsApp';
     return filter;
   }
 

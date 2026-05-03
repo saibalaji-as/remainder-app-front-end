@@ -1,6 +1,6 @@
 // Matches Supabase reminders table column names (snake_case)
-export type DeliveryStatus = 'pending' | 'sent' | 'failed';
-export type ReminderChannel = 'sms' | 'email' | 'both';
+export type DeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped';
+export type ReminderChannel = 'sms' | 'email' | 'both' | 'whatsapp' | 'whatsapp_sms' | 'whatsapp_email' | 'all';
 
 export interface Reminder {
   id: string;
