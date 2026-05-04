@@ -10,6 +10,11 @@
   <!-- ── Page header ──────────────────────────────────────────────────────── -->
   <app-page-header title="Appointments">
     <ng-container actions>
+      @if (isDevMode) {
+        <button class="btn-simulate-nudge" type="button" (click)="simulateNudge()" title="Simulate a nudge notification">
+          😊 Simulate Nudge
+        </button>
+      }
       <button class="btn-gradient-pill" (click)="showAddForm = !showAddForm">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
              fill="none" stroke="currentColor" stroke-width="2.5"

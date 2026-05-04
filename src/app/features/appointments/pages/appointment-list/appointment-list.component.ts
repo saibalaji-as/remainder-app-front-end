@@ -10,6 +10,7 @@ import { Appointment, AppointmentCreateDto, ReminderChannel, AppointmentStatus, 
 import { Contact } from '../../../../core/models/contact.model';
 import { NudgeEvent } from '../../../../core/models/confirm.model';
 import { NudgeBannerComponent } from '../../../../shared/components/nudge-banner/nudge-banner.component';
+import { environment } from '../../../../../environments/environment';
 import {
   AppShellComponent,
   PageHeaderComponent,
@@ -46,6 +47,7 @@ export class AppointmentListComponent implements OnInit, OnDestroy {
   showAddForm = false;
   updatingStatusId: string | null = null;
   nudgeEvent: NudgeEvent | null = null;
+  readonly isDevMode = !environment.production;
   private sseSubscription?: Subscription;
 
   /** Active status tab — 'All' shows every appointment */
@@ -93,8 +95,7 @@ export class AppointmentListComponent implements OnInit, OnDestroy {
             this.onNudgeEvent(data);
           } catch {}
         }
-      },
-      error: () => {} // SSE errors are handled silently
+      }
     });
   }
 
@@ -171,6 +172,26 @@ export class AppointmentListComponent implements OnInit, OnDestroy {
 
   onNudgeEvent(event: NudgeEvent): void {
     this.nudgeEvent = event;
+  }
+
+  /** Dev-only: calls the backend test endpoint to fire a real SSE nudge */
+  simulateNudge(): void {
+    const first = this.appointments[0];
+    if (!first) {
+      this.toast.error('No appointments to simulate nudge for.');
+      return;
+    }
+    this.api.post<{ success: boolean; sseClientsConnected: boolean; nudge: NudgeEvent }>(
+      `/test/nudge/${first.id}`, {}
+    ).subscribe({
+      next: (res) => {
+        if (!res.sseClientsConnected) {
+          this.toast.error('Nudge fired but no SSE clients were connected — banner won\'t appear. Check your connection.');
+        }
+        // The banner will appear automatically via the SSE subscription
+      },
+      error: () => this.toast.error('Failed to fire test nudge.')
+    });
   }
 
   openStatusUpdate(appointmentId: string): void {

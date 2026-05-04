@@ -575,3 +575,39 @@
   background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
   transition: background 0.3s ease;
 }
+
+// ── Dev-only simulate nudge button ─────────────────────────────────────────
+
+.btn-simulate-nudge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  background: transparent;
+  color: #d97706;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1.5px dashed #f59e0b;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background-color: color-mix(in srgb, #f59e0b 12%, transparent);
+    border-color: #d97706;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #f59e0b;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    color: #fbbf24;
+    border-color: #f59e0b;
+
+    &:hover {
+      background-color: color-mix(in srgb, #f59e0b 15%, transparent);
+    }
+  }
+}

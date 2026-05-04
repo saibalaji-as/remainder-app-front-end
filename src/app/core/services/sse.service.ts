@@ -4,61 +4,87 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 /**
- * Wraps the native EventSource API as an RxJS Observable.
+ * Wraps the native EventSource API as an RxJS Observable with auto-reconnect.
  *
- * Usage:
- *   this.sseService.connect('/sse/reminders').subscribe({
- *     next: (event) => { ... },
- *     error: () => { /* connection dropped, caller handles reconnect *\/ }
- *   });
+ * On error/disconnect, automatically retries with exponential backoff
+ * (1s → 2s → 4s → … capped at 30s). The Observable never errors out —
+ * it keeps retrying as long as it is subscribed.
  */
 @Injectable({ providedIn: 'root' })
 export class SseService {
+  private readonly NAMED_EVENTS = [
+    'email-sent',
+    'connected',
+    'appointment-confirmed',
+    'appointment-cancelled',
+    'appointment-completed',
+    'appointment-needs-update',
+  ];
+
   constructor(private authService: AuthService) {}
 
-  /**
-   * Opens an SSE connection to `path` (relative to the API base URL).
-   * The JWT token is appended as a query parameter so the backend
-   * auth middleware can authenticate the EventSource request
-   * (EventSource does not support custom headers in browsers).
-   *
-   * The Observable emits each MessageEvent and completes on error.
-   * The caller is responsible for reconnect logic.
-   */
   connect(path: string): Observable<MessageEvent> {
     return new Observable<MessageEvent>((observer) => {
-      const token = this.authService.getToken();
-      const url = `${environment.apiBaseUrl}${path}${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+      let eventSource: EventSource | null = null;
+      let retryDelay = 1000;       // start at 1 s
+      const MAX_DELAY  = 30_000;   // cap at 30 s
+      let retryTimer: ReturnType<typeof setTimeout> | null = null;
+      let destroyed = false;
 
-      const eventSource = new EventSource(url);
+      const namedEventHandler = (event: MessageEvent) => observer.next(event);
 
-      eventSource.onmessage = (event: MessageEvent) => {
-        observer.next(event);
+      const attach = (es: EventSource) => {
+        es.onmessage = (event) => observer.next(event);
+        this.NAMED_EVENTS.forEach(name => es.addEventListener(name, namedEventHandler));
       };
 
-      // Listen for named events (e.g. 'email-sent', 'connected')
-      const namedEventHandler = (event: MessageEvent) => {
-        observer.next(event);
-      };
-      const namedEvents = [
-        'email-sent',
-        'connected',
-        'appointment-confirmed',
-        'appointment-cancelled',
-        'appointment-completed',
-        'appointment-needs-update',
-      ];
-      namedEvents.forEach(name => eventSource.addEventListener(name, namedEventHandler));
-
-      eventSource.onerror = () => {
-        eventSource.close();
-        observer.error(new Error('SSE connection error'));
+      const detach = (es: EventSource) => {
+        this.NAMED_EVENTS.forEach(name => es.removeEventListener(name, namedEventHandler));
+        es.onmessage = null;
+        es.onerror   = null;
       };
 
-      // Teardown: close the EventSource when the Observable is unsubscribed
+      const open = () => {
+        if (destroyed) return;
+
+        const token = this.authService.getToken();
+        const url   = `${environment.apiBaseUrl}${path}${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+
+        eventSource = new EventSource(url);
+        attach(eventSource);
+
+        eventSource.onerror = () => {
+          if (destroyed) return;
+          detach(eventSource!);
+          eventSource!.close();
+          eventSource = null;
+
+          // Reconnect with exponential backoff
+          console.warn(`SSE connection lost — retrying in ${retryDelay / 1000}s`);
+          retryTimer = setTimeout(() => {
+            retryDelay = Math.min(retryDelay * 2, MAX_DELAY);
+            open();
+          }, retryDelay);
+        };
+
+        // Reset backoff on successful open
+        eventSource.addEventListener('connected', () => {
+          retryDelay = 1000;
+          console.log('SSE connected ✓');
+        });
+      };
+
+      open();
+
+      // Teardown — called when the component unsubscribes (e.g. ngOnDestroy)
       return () => {
-        namedEvents.forEach(name => eventSource.removeEventListener(name, namedEventHandler));
-        eventSource.close();
+        destroyed = true;
+        if (retryTimer !== null) clearTimeout(retryTimer);
+        if (eventSource) {
+          detach(eventSource);
+          eventSource.close();
+          eventSource = null;
+        }
       };
     });
   }
