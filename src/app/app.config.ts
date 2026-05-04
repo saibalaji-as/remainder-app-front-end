@@ -12,9 +12,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(APP_ROUTES),
     provideHttpClient(withFetch(), withInterceptors([jwtInterceptor])),
     provideCharts(withDefaultRegisterables()),
-    provideServiceWorker('ngsw-worker.js', {
+    provideServiceWorker('custom-sw.js', {
       enabled: true,
-      registrationStrategy: 'registerWhenStable:30000'
+      registrationStrategy: 'registerImmediately'
     })
   ]
 };
