@@ -1,5 +1,7 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 export interface ConfirmDialogData {
   title: string;
@@ -7,10 +9,6 @@ export interface ConfirmDialogData {
   confirmLabel?: string;
   cancelLabel?: string;
 }
-
-// Lightweight dialog service to replace MatDialog
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {
@@ -20,16 +18,33 @@ export class DialogService {
     const overlay = document.createElement('div');
     overlay.className = 'dialog-overlay';
 
-    overlay.innerHTML = `
-      <div class="dialog-panel" role="dialog" aria-modal="true">
-        <h2 class="dialog-title">${data.title}</h2>
-        <p class="dialog-message">${data.message}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-secondary dialog-cancel">${data.cancelLabel ?? 'Cancel'}</button>
-          <button class="btn btn-danger dialog-confirm">${data.confirmLabel ?? 'Confirm'}</button>
-        </div>
-      </div>
-    `;
+    const panel = document.createElement('div');
+    panel.className = 'dialog-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+
+    const title = document.createElement('h2');
+    title.className = 'dialog-title';
+    title.textContent = data.title;
+
+    const message = document.createElement('p');
+    message.className = 'dialog-message';
+    message.textContent = data.message;
+
+    const actions = document.createElement('div');
+    actions.className = 'dialog-actions';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'btn btn-secondary dialog-cancel';
+    cancelButton.textContent = data.cancelLabel ?? 'Cancel';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.className = 'btn btn-danger dialog-confirm';
+    confirmButton.textContent = data.confirmLabel ?? 'Confirm';
+
+    actions.append(cancelButton, confirmButton);
+    panel.append(title, message, actions);
+    overlay.appendChild(panel);
 
     document.body.appendChild(overlay);
     requestAnimationFrame(() => overlay.classList.add('dialog-visible'));
@@ -41,8 +56,8 @@ export class DialogService {
       result$.complete();
     };
 
-    overlay.querySelector('.dialog-confirm')!.addEventListener('click', () => close(true));
-    overlay.querySelector('.dialog-cancel')!.addEventListener('click', () => close(false));
+    confirmButton.addEventListener('click', () => close(true));
+    cancelButton.addEventListener('click', () => close(false));
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(undefined); });
 
     return { afterClosed: () => result$ };

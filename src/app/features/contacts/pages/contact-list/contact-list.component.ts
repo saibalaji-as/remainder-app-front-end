@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, concatMap, debounceTime, distinctUntilChanged, from, takeUntil, toArray } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { DialogService } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -36,6 +36,7 @@ export class ContactListComponent implements OnInit, OnDestroy {
   showAddForm = false;
   csvPreviewRows: string[][] = [];
   csvHeaders: string[] = [];
+  private csvRows: string[][] = [];
 
   pageSize = 10;
   pageIndex = 0;
@@ -146,9 +147,10 @@ export class ContactListComponent implements OnInit, OnDestroy {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
-      const lines = text.split('\n').filter(l => l.trim());
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
       this.csvHeaders = lines[0].split(',').map(h => h.trim());
-      this.csvPreviewRows = lines.slice(1, 6).map(l => l.split(',').map(v => v.trim()));
+      this.csvRows = lines.slice(1).map(l => l.split(',').map(v => v.trim()));
+      this.csvPreviewRows = this.csvRows.slice(0, 5);
     };
     reader.readAsText(file);
   }
@@ -163,26 +165,36 @@ export class ContactListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const requests = this.csvPreviewRows.map(row =>
-      this.api.post<Contact>('/contacts', {
+    if (this.csvRows.length === 0) {
+      this.toast.error('CSV has no contact rows to import.');
+      return;
+    }
+
+    const contacts = this.csvRows
+      .map(row => ({
         name: row[nameIdx],
         email: row[emailIdx],
         phone: row[phoneIdx]
-      })
-    );
+      }))
+      .filter(row => row.name && row.email && row.phone);
 
-    let completed = 0;
-    requests.forEach(req => req.subscribe({
-      next: () => {
-        completed++;
-        if (completed === requests.length) {
-          this.toast.success(`${completed} contacts imported.`);
-          this.csvPreviewRows = [];
-          this.csvHeaders = [];
-          this.loadContacts();
-        }
+    if (contacts.length === 0) {
+      this.toast.error('CSV rows must include name, email, and phone values.');
+      return;
+    }
+
+    from(contacts).pipe(
+      concatMap(contact => this.api.post<Contact>('/contacts', contact)),
+      toArray()
+    ).subscribe({
+      next: (created) => {
+        this.toast.success(`${created.length} contacts imported.`);
+        this.csvPreviewRows = [];
+        this.csvHeaders = [];
+        this.csvRows = [];
+        this.loadContacts();
       },
       error: () => this.toast.error('Failed to import one or more contacts.')
-    }));
+    });
   }
 }
